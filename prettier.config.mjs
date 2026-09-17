@@ -4,4 +4,5 @@ export default {
   trailingComma: "all",
   semi: true,
   singleQuote: false,
+  endOfLine: "lf",
 };
