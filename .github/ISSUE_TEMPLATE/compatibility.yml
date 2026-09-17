@@ -1,0 +1,19 @@
+name: Compatibility report
+description: Report behavior for a React Router, ESLint, or Node.js version
+title: "compat: "
+labels: [compatibility]
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Version matrix
+      description: Include plugin, React Router, ESLint, Node.js, OS, and package manager versions.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Include the command, output, and smallest reproduction.
+    validations:
+      required: true

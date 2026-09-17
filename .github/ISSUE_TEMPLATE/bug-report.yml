@@ -1,0 +1,26 @@
+name: Bug report
+description: Report a reproducible plugin problem
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the rule name, source snippet, and actual/expected diagnostics.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: React Router, ESLint, Node.js, and plugin versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Link to a minimal repository or paste a complete fixture.
+    validations:
+      required: true

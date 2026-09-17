@@ -1,0 +1,91 @@
+{
+  "name": "eslint-plugin-react-router",
+  "version": "0.1.0",
+  "description": "ESLint rules for React Router route modules and route configuration",
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@12.4.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Th3Trig3rFac3/react-router-eslint-plugin.git"
+  },
+  "homepage": "https://github.com/Th3Trig3rFac3/react-router-eslint-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/Th3Trig3rFac3/react-router-eslint-plugin/issues"
+  },
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "eslintplugin",
+    "react-router",
+    "reactrouter",
+    "remix",
+    "routing"
+  ],
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=22.23.2"
+  },
+  "peerDependencies": {
+    "eslint": "^10.0.0"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^8.70.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.9.7",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "@typescript-eslint/rule-tester": "^8.70.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-eslint-plugin": "^7.6.2",
+    "prettier": "^3.9.7",
+    "publint": "^0.3.24",
+    "tsdown": "^0.23.0",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
+    "dev": "tsdown --watch",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "docs:check": "tsx scripts/verify-rule-index.ts",
+    "package:check": "pnpm build && tsx scripts/verify-package.ts && publint && attw --pack",
+    "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm docs:check && pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

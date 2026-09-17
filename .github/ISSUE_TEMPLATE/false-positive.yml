@@ -1,0 +1,23 @@
+name: False positive
+description: Report a legitimate route pattern that is incorrectly reported
+title: "false positive: "
+labels: [false-positive]
+body:
+  - type: input
+    id: rule
+    attributes:
+      label: Rule
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal example
+      description: Include the route module/config and the intended React Router behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround
+      description: Tell us whether an option or targeted disable is practical.
