@@ -195,7 +195,9 @@ Recognize `new Response(...)`, returned or thrown `Response` values, React Route
 
 ### High-value follow-up candidates
 
-Evaluate these through separate design issues before implementation:
+The expanded and prioritized backlog is maintained in
+[RULE_IDEAS.md](./RULE_IDEAS.md). Evaluate every candidate through a separate
+design issue before implementation. The initial shortlist is:
 
 - `require-hydrate-fallback`: when client-loader hydration opts in, require the route's documented hydration fallback contract.
 - `no-conflicting-route-paths`: detect duplicate static sibling paths or indistinguishable route entries in `routes.ts`.
@@ -256,12 +258,15 @@ Configuration changes that create new diagnostics require deliberate semver trea
 │   ├── ISSUE_TEMPLATE/
 │   ├── workflows/ci.yml
 │   └── workflows/release.yml
-├── docs/rules/
-│   ├── no-action-only-routes.md
-│   ├── no-invalid-route-exports.md
-│   ├── require-root-error-boundary.md
-│   ├── resource-route-returns-response.md
-│   └── valid-route-module-path.md
+├── docs/
+│   ├── PLAN.md
+│   ├── RULE_IDEAS.md
+│   └── rules/
+│       ├── no-action-only-routes.md
+│       ├── no-invalid-route-exports.md
+│       ├── require-root-error-boundary.md
+│       ├── resource-route-returns-response.md
+│       └── valid-route-module-path.md
 ├── scripts/
 │   ├── generate-rule-docs.ts
 │   └── verify-rule-index.ts
@@ -289,7 +294,6 @@ Configuration changes that create new diagnostics require deliberate semver trea
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── docs/PLAN.md
 ├── README.md
 ├── SECURITY.md
 ├── package.json

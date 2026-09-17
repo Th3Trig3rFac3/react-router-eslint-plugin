@@ -159,6 +159,8 @@ rule's contract.
 
 The detailed architecture, rule contracts, test strategy, packaging work,
 documentation requirements, and release phases are in [PLAN.md](./docs/PLAN.md).
+The prioritized backlog of possible future rules is in
+[RULE_IDEAS.md](./docs/RULE_IDEAS.md).
 
 Early feedback is particularly useful for:
 
