@@ -7,9 +7,16 @@ import { fileURLToPath } from "node:url";
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const rules = [
   "no-action-only-routes",
+  "no-conflicting-route-exports",
+  "no-conflicting-route-paths",
+  "no-duplicate-route-ids",
+  "no-duplicate-route-params",
   "no-invalid-route-exports",
+  "require-hydrate-fallback",
   "require-root-error-boundary",
   "resource-route-returns-response",
+  "safe-should-revalidate",
+  "valid-route-config",
   "valid-route-module-path",
 ];
 

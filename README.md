@@ -18,7 +18,14 @@ configuration.
 | Rule                              | Purpose                                                                                                                                   | Config               |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | `no-action-only-routes`           | Warn when a route exports an action but cannot handle a refreshed `GET` request. Intentional action-only resource routes can be excluded. | Recommended          |
+| `no-conflicting-route-exports`    | In the opt-in RSC preset, find mutually exclusive client/server route exports.                                                            | RSC opt-in           |
+| `no-conflicting-route-paths`      | Find exact duplicate sibling paths, including paths introduced through `prefix()`.                                                        | Recommended          |
+| `no-duplicate-route-ids`          | Find repeated explicit route IDs in a static route configuration.                                                                         | Recommended          |
+| `no-duplicate-route-params`       | Find repeated parameter names in one effective route pattern.                                                                             | Recommended          |
+| `require-hydrate-fallback`        | Warn when `clientLoader.hydrate = true` has no `HydrateFallback` export.                                                                  | Strict               |
 | `require-root-error-boundary`     | Require the root route to export an `ErrorBoundary`.                                                                                      | Recommended          |
+| `safe-should-revalidate`          | Warn about trivially unconditional `shouldRevalidate` implementations that always return `false`.                                         | Strict               |
+| `valid-route-config`              | Validate statically understandable route helper calls and `RouteConfigEntry` object literals.                                             | Recommended          |
 | `valid-route-module-path`         | Check that static module paths referenced by `routes.ts` resolve to files.                                                                | Recommended          |
 | `no-invalid-route-exports`        | Find misspelled or unsupported route-module exports.                                                                                      | Strict               |
 | `resource-route-returns-response` | Require externally consumed resource routes to return a `Response`, with explicit file scoping.                                           | Strict, opt-in scope |

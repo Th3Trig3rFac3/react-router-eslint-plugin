@@ -21,6 +21,20 @@ analyzer should be built from `routes.ts`, static local fragments, route module
 exports, and `react-router.config.ts` without importing or executing application
 code.
 
+## Implemented in this release
+
+The first four candidates below are now available in the plugin. They share a
+static route-config analyzer and intentionally skip dynamic builders and
+unresolved spreads:
+
+- `valid-route-config`
+- `no-duplicate-route-ids`
+- `no-conflicting-route-paths`
+- `no-duplicate-route-params`
+- `require-hydrate-fallback`
+- `safe-should-revalidate`
+- `no-conflicting-route-exports` (opt-in RSC preset)
+
 ## Best next candidates
 
 ### `valid-route-config`
@@ -269,15 +283,17 @@ earlier or clearer than the build diagnostic.
 
 ## Suggested implementation order
 
-1. `valid-route-config`
-2. `no-duplicate-route-ids`
-3. `no-duplicate-route-params`
-4. exact cases for `no-conflicting-route-paths`
-5. `require-hydrate-fallback`
-6. `valid-route-params`
-7. `no-resource-route-client-navigation`
-8. `require-outlet-for-child-routes`
-9. project-policy and client/server dependency rules
+The first four items in the original order, plus the hydration, revalidation,
+and opt-in RSC checks, are implemented. The remaining shortlist is:
+
+These remain intentionally deferred until the plugin has a cached,
+parser-backed project graph that can inspect referenced route modules without
+adding a runtime parser dependency or relying on ESLint file order.
+
+1. `valid-route-params`
+2. `no-resource-route-client-navigation`
+3. `require-outlet-for-child-routes`
+4. project-policy and client/server dependency rules
 
 The first four can reuse the existing `routes.ts` import tracking and path
 resolution without requiring type services. The later rules benefit from a

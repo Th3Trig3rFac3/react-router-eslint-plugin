@@ -13,15 +13,23 @@ describe("plugin package", () => {
     expect(Object.keys(plugin.rules)).toEqual(
       expect.arrayContaining([
         "no-action-only-routes",
+        "no-conflicting-route-exports",
+        "no-conflicting-route-paths",
+        "no-duplicate-route-ids",
+        "no-duplicate-route-params",
         "no-invalid-route-exports",
+        "require-hydrate-fallback",
         "require-root-error-boundary",
         "resource-route-returns-response",
+        "safe-should-revalidate",
         "valid-resource-route",
+        "valid-route-config",
         "valid-route-module-path",
       ]),
     );
     expect(plugin.configs).toHaveProperty("recommended");
     expect(plugin.configs).toHaveProperty("strict");
+    expect(plugin.configs).toHaveProperty("rsc");
   });
 
   it("loads through ESLint flat config", async () => {
