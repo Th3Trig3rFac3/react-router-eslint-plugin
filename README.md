@@ -105,7 +105,7 @@ export default [
 
 | Component    | Current support policy                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Node.js      | `>=22.23.2`                                                                                                                           |
+| Node.js      | `^22.23.2 \|\| ^24.21.0`                                                                                                              |
 | ESLint       | `^10.0.0`                                                                                                                             |
 | React Router | Framework-mode route modules and `@react-router/dev/routes` syntax; the plugin does not add React Router as a runtime peer dependency |
 

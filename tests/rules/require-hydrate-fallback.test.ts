@@ -37,6 +37,17 @@ ruleTester.run("require-hydrate-fallback", rule, {
       options: [{ allowFiles: ["app/routes/webhook.ts"] }],
     },
     {
+      filename: "app/routes/cache-primed.tsx",
+      code: `
+        export async function loader() { return getData(); }
+        export async function clientLoader({ serverLoader }) {
+          return serverLoader();
+        }
+        clientLoader.hydrate = true;
+      `,
+      options: [{ allowFiles: ["app/routes/cache-primed.tsx"] }],
+    },
+    {
       filename: "src/shared/client.ts",
       code: `
         export async function clientLoader() { return getData(); }

@@ -22,6 +22,22 @@ const rules = [
 
 const read = (filename: string) => fs.readFileSync(path.join(root, filename), "utf8");
 const readme = read("README.md");
+const normalizedReadme = readme.replaceAll("\\|", "|");
+const nodeRow = normalizedReadme
+  .split(/\r?\n/u)
+  .find((line) => /^\|\s*Node\.js\s*\|/u.test(line));
+const packageJson = JSON.parse(read("package.json")) as {
+  engines?: { node?: unknown };
+};
+const nodeEngine = packageJson.engines?.node;
+if (typeof nodeEngine !== "string") {
+  throw new Error("package.json is missing a string engines.node value");
+}
+if (!nodeRow?.includes(`\`${nodeEngine}\``)) {
+  throw new Error(
+    `README Node.js support row does not match engines.node: ${nodeEngine}`,
+  );
+}
 
 for (const rule of rules) {
   const docPath = path.join(root, "docs", "rules", `${rule}.md`);

@@ -16,4 +16,6 @@ route("teams/:teamId/members/:memberId", "./member.tsx");
 ```
 
 The rule recognizes dynamic parameters and splats. Dynamic or unresolved route
-patterns are skipped.
+patterns are skipped. Imported route-config fragments are not merged into a
+project-wide graph yet, so the rule checks the statically analyzable route tree
+in the file being linted.

@@ -17,4 +17,6 @@ export default [
 
 The rule focuses on exact static duplicates. It does not rank patterns such as
 `:id` and `new`, because React Router can resolve those patterns deliberately.
-Pathless layout entries are not reported as conflicts.
+Pathless layout entries are not reported as conflicts. Imported route-config
+fragments are not merged into a project-wide graph yet, so duplicate detection
+is limited to the file being linted.

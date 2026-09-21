@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-react-router",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "ESLint rules for React Router route modules and route configuration",
   "license": "Apache-2.0",
   "type": "module",

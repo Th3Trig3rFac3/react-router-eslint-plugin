@@ -3,11 +3,13 @@ import parser from "@typescript-eslint/parser";
 import { describe, expect, it } from "vitest";
 
 import plugin from "../../src/index.js";
+import packageJson from "../../package.json";
 
 describe("plugin package", () => {
   it("exports the documented rules and flat configs", () => {
     expect(plugin.meta).toMatchObject({
       name: "eslint-plugin-react-router",
+      version: packageJson.version,
       namespace: "react-router",
     });
     expect(Object.keys(plugin.rules)).toEqual(

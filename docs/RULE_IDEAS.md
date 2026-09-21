@@ -21,77 +21,26 @@ analyzer should be built from `routes.ts`, static local fragments, route module
 exports, and `react-router.config.ts` without importing or executing application
 code.
 
-## Implemented in this release
+## Already implemented
 
-The first four candidates below are now available in the plugin. They share a
-static route-config analyzer and intentionally skip dynamic builders and
-unresolved spreads:
+These rules are exported today. The route-config rules analyze static syntax in
+the current `routes.ts` file; they do not yet index imported route-config
+fragments or inspect referenced route modules:
 
 - `valid-route-config`
 - `no-duplicate-route-ids`
 - `no-conflicting-route-paths`
 - `no-duplicate-route-params`
-- `require-hydrate-fallback`
-- `safe-should-revalidate`
+- `require-hydrate-fallback` (`strict`)
+- `safe-should-revalidate` (`strict`)
 - `no-conflicting-route-exports` (opt-in RSC preset)
 
+The plugin also exports `require-root-error-boundary`,
+`valid-route-module-path`, `no-action-only-routes`, `no-invalid-route-exports`,
+and the opt-in `resource-route-returns-response` rule. See the
+[README rule table](../README.md#rules) for config membership.
+
 ## Best next candidates
-
-### `valid-route-config`
-
-Validate statically understandable `RouteConfigEntry` objects and calls to
-`route`, `index`, `layout`, `prefix`, and `relative`.
-
-Initial checks could include:
-
-- the default export is an array or a supported static expression;
-- every entry has a module file where one is required;
-- `index: true` entries do not have children;
-- helper arguments appear in the documented positions;
-- `children` is an array of route entries;
-- `id`, `path`, `file`, and `caseSensitive` have sensible literal types in
-  JavaScript files.
-
-This would primarily help JavaScript projects and malformed generated configs.
-TypeScript users may already receive several of these diagnostics, so duplicate
-reports should be suppressed when a precise TypeScript error exists.
-
-Suggested config: `recommended` for definite structural errors.
-
-### `no-duplicate-route-ids`
-
-Build the static route graph and report repeated explicit route IDs. Route IDs
-are documented as unique, and collisions can make route lookup and generated
-types ambiguous.
-
-The rule should report both declarations, ignore dynamic IDs it cannot prove,
-and account for route config fragments without depending on ESLint file order.
-
-Suggested config: `recommended`.
-
-### `no-conflicting-route-paths`
-
-Report sibling route entries that have the same effective static path and
-equivalent case-sensitivity. Include collisions introduced through `prefix()`
-or `relative()` fragments.
-
-Start with exact duplicates. Ranking conflicts such as `:id` versus `new`,
-optional segments, and splats need separate research because React Router may
-resolve them deterministically even when the result surprises a developer.
-
-Suggested config: exact duplicates in `recommended`; ambiguous patterns in
-`strict` or a separate rule.
-
-### `no-duplicate-route-params`
-
-Report a single route pattern that declares the same parameter name more than
-once, for example `teams/:id/members/:id`. Repeated names make `params.id`
-ambiguous and usually indicate a copy/paste mistake.
-
-The rule can operate locally on static route path literals and does not require
-type information.
-
-Suggested config: `recommended`.
 
 ### `valid-route-params`
 
@@ -118,29 +67,6 @@ imported layout. Support allowlisted wrapper components and skip components the
 rule cannot inspect confidently.
 
 Suggested config: `strict`, warning only.
-
-### `require-hydrate-fallback`
-
-When a route assigns `clientLoader.hydrate = true`, require a
-`HydrateFallback` export unless the file is explicitly exempted. React Router
-can wait for the client loader during initial hydration, so a fallback avoids an
-unexplained empty or delayed route area.
-
-Recognize `true as const`, export aliases, and common function assignment
-patterns. Do not require a fallback merely because a `clientLoader` exists.
-
-Suggested config: `recommended` warning or `strict` error after validation.
-
-### `safe-should-revalidate`
-
-Detect implementations that always return `false`, or branches that ignore
-`defaultShouldRevalidate` without an explicit project opt-out. An unconditional
-false can leave UI data out of sync with the server.
-
-This rule should focus on obvious constant implementations. General control-flow
-proof would be expensive and likely noisy.
-
-Suggested config: `strict`.
 
 ### `no-resource-route-client-navigation`
 
@@ -169,19 +95,28 @@ intentional cases.
 
 Suggested config: `strict` warning.
 
-### `no-conflicting-route-exports`
+### `no-multiple-middleware-next`
 
-Report mutually exclusive route module exports. The first useful contract is
-React Server Components, where a route cannot export both `default` and
-`ServerComponent`. Equivalent client/server boundary pairs such as
-`ErrorBoundary`/`ServerErrorBoundary`, `Layout`/`ServerLayout`, and
-`HydrateFallback`/`ServerHydrateFallback` can be added only while those APIs are
-supported and their contracts remain stable.
+Report a statically provable second call to the same `next` parameter in one
+server or client middleware function. React Router permits only one call per
+middleware invocation; a second call throws at runtime. Recognize route module
+`middleware` and `clientMiddleware` arrays, including locally declared functions.
+Skip callbacks, aliases, loops, and branches where execution count is uncertain.
 
-Keep experimental APIs behind an option or versioned preset so stable users do
-not receive diagnostics for syntax their React Router version does not know.
+Suggested config: `recommended` for unconditional duplicate calls; use a
+separate `strict` option for path-sensitive cases.
 
-Suggested config: opt-in RSC preset first.
+### `return-server-middleware-response`
+
+For a server middleware function that calls `next()`, report an obvious path
+that discards its `Response` and returns `undefined`. This can lose status,
+headers, or body changes from downstream handlers. Do not report middleware
+that intentionally omits `next()` and relies on React Router's automatic call,
+or `clientMiddleware`, whose return contract differs. Start with direct
+`await next();` followed by an empty return or function end; defer complex
+control flow.
+
+Suggested config: `strict` until confirmed against representative applications.
 
 ## Useful project-policy rules
 
@@ -283,21 +218,18 @@ earlier or clearer than the build diagnostic.
 
 ## Suggested implementation order
 
-The first four items in the original order, plus the hydration, revalidation,
-and opt-in RSC checks, are implemented. The remaining shortlist is:
+1. Validate and repair current rule contracts listed in [repair.md](repair.md).
+2. Prototype `no-multiple-middleware-next` using local route-module syntax.
+3. Build a cached, parser-backed project graph for imported route fragments and
+   referenced route modules. Keep resolution independent of ESLint file order.
+4. Prototype `valid-route-params`, `no-resource-route-client-navigation`, and
+   `require-outlet-for-child-routes` against representative applications.
+5. Evaluate project-policy and client/server dependency rules after the graph
+   has a measured performance budget and explicit uncertainty handling.
 
-These remain intentionally deferred until the plugin has a cached,
-parser-backed project graph that can inspect referenced route modules without
-adding a runtime parser dependency or relying on ESLint file order.
-
-1. `valid-route-params`
-2. `no-resource-route-client-navigation`
-3. `require-outlet-for-child-routes`
-4. project-policy and client/server dependency rules
-
-The first four can reuse the existing `routes.ts` import tracking and path
-resolution without requiring type services. The later rules benefit from a
-cached project graph and need more representative-app testing.
+`no-action-form-default-method` and `return-server-middleware-response` can be
+tested independently, but should enter shared configs only after their legitimate
+patterns and overlap with React Router or TypeScript diagnostics are measured.
 
 ## Primary React Router references
 
@@ -311,3 +243,4 @@ cached project graph and need more representative-app testing.
 - [Automatic route-module code splitting](https://reactrouter.com/explanation/code-splitting)
 - [`react-router.config.ts`](https://reactrouter.com/api/framework-conventions/react-router.config.ts)
 - [React Server Components](https://reactrouter.com/how-to/react-server-components)
+- [Middleware](https://reactrouter.com/how-to/middleware)

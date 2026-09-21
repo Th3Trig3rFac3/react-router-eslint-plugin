@@ -40,7 +40,7 @@ export default createRule<Options, "missingHydrateFallback">({
     ],
     messages: {
       missingHydrateFallback:
-        "This route opts into client-loader hydration but exports no HydrateFallback. Add a HydrateFallback export or remove the hydrate assignment if no fallback UI is intended.",
+        "This route opts into client-loader hydration but exports no HydrateFallback. Add a fallback for loading UI, or exempt an intentional SSR/cache-priming pattern with allowFiles.",
     },
   },
   defaultOptions: [{}],

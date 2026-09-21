@@ -14,6 +14,7 @@ import validRouteModulePath from "./rules/valid-route-module-path.js";
 import validRouteConfig from "./rules/valid-route-config.js";
 import { createConfigs } from "./configs/index.js";
 import type { TSESLint } from "@typescript-eslint/utils";
+import packageJson from "../package.json";
 
 export const rules = {
   "no-action-only-routes": noActionOnlyRoutes,
@@ -33,7 +34,7 @@ export const rules = {
 
 export const meta = {
   name: "eslint-plugin-react-router",
-  version: "0.1.0",
+  version: packageJson.version,
   namespace: "react-router",
 };
 

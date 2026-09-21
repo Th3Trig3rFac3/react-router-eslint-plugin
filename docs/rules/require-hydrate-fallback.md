@@ -1,11 +1,16 @@
 # require-hydrate-fallback
 
 Warn when a route exports a `clientLoader`, sets its `hydrate` property to
-`true`, and exports no `HydrateFallback`.
+`true`, and exports no `HydrateFallback`. This is an optional UI policy for
+routes that need a loading state while hydration runs, not a universal React
+Router validity requirement.
 
-When client-loader hydration is forced, React Router waits for the client
+When client-loader hydration is forced, React Router may wait for the client
 loader before rendering the route component. A fallback gives the route a
-useful loading UI during that interval.
+useful loading UI during that interval. An application may intentionally omit
+the fallback when the server-rendered component and the client loader are
+designed to produce matching data during hydration, such as a cache-priming
+pattern. Use `allowFiles` for those files.
 
 Incorrect:
 
@@ -32,4 +37,6 @@ export function HydrateFallback() {
 ```
 
 The rule is enabled as a warning in `strict`. Dynamic assignments are skipped.
-Intentional exceptions can use `allowFiles` (with `allow` accepted as an alias).
+Intentional SSR or cache-priming exceptions can use `allowFiles` (with `allow`
+accepted as an alias). The diagnostic suggests adding a fallback or documenting
+the intentional exception.
