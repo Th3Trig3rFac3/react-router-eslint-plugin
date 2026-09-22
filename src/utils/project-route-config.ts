@@ -184,8 +184,18 @@ export function analyzeProjectRouteConfig(
   const visited = new Set<string>([path.normalize(currentFile)]);
   const importedFiles: string[] = [];
   let hasUnknownImports = false;
-  const queue: Array<{ filename: string; program: TSESTree.Program; depth: number }> = [
-    { filename: currentFile, program, depth: 0 },
+  const queue: Array<{
+    filename: string;
+    program: TSESTree.Program;
+    depth: number;
+    ancestors: Set<string>;
+  }> = [
+    {
+      filename: currentFile,
+      program,
+      depth: 0,
+      ancestors: new Set([path.normalize(currentFile)]),
+    },
   ];
   const maxDepth = 16;
 
@@ -202,6 +212,13 @@ export function analyzeProjectRouteConfig(
         continue;
       }
       const normalized = path.normalize(resolved);
+      if (item.ancestors.has(normalized)) {
+        // A recursive route-config fragment cannot be safely flattened. Keep
+        // the graph conservative so orphan checks do not report files based on
+        // an incomplete traversal.
+        hasUnknownImports = true;
+        continue;
+      }
       if (visited.has(normalized)) continue;
       const safe = safeProjectPath(projectRoot, normalized);
       if (!safe) {
@@ -237,6 +254,7 @@ export function analyzeProjectRouteConfig(
         filename: normalized,
         program: parsed.program,
         depth: item.depth + 1,
+        ancestors: new Set([...item.ancestors, normalized]),
       });
     }
   }

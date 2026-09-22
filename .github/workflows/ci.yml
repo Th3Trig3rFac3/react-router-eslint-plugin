@@ -37,6 +37,10 @@ jobs:
       - name: Run checks
         run: pnpm run ci
 
+      - name: Record coverage baseline
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '24.x'
+        run: pnpm run test:coverage
+
       - name: Validate package exports
         if: matrix.os == 'ubuntu-latest'
         run: pnpm package:check
