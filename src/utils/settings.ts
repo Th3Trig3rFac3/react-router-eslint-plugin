@@ -13,6 +13,9 @@ const DEFAULT_SETTINGS: NormalizedReactRouterSettings = {
   appDirectory: "app",
   rootRoute: ["app/root.*"],
   routeConfig: ["app/routes.ts", "app/routes.js"],
+  frameworkConfig: ["react-router.config.*", "react-router.config.*.*"],
+  routePaths: [],
+  resourceRoutePaths: [],
   routeModuleFiles: ["app/root.*", "app/routes/**/*"],
   extensions: [...DEFAULT_EXTENSIONS],
 };
@@ -38,6 +41,15 @@ export function getSettings(
         : DEFAULT_SETTINGS.appDirectory,
     rootRoute: asStringArray(raw?.rootRoute, DEFAULT_SETTINGS.rootRoute),
     routeConfig: asStringArray(raw?.routeConfig, DEFAULT_SETTINGS.routeConfig),
+    frameworkConfig: asStringArray(
+      raw?.frameworkConfig,
+      DEFAULT_SETTINGS.frameworkConfig,
+    ),
+    routePaths: asStringArray(raw?.routePaths, DEFAULT_SETTINGS.routePaths),
+    resourceRoutePaths: asStringArray(
+      raw?.resourceRoutePaths,
+      DEFAULT_SETTINGS.resourceRoutePaths,
+    ),
     routeModuleFiles: asStringArray(
       raw?.routeModuleFiles,
       DEFAULT_SETTINGS.routeModuleFiles,
@@ -147,6 +159,17 @@ export function isRouteConfigFile(
   return (
     filename !== undefined &&
     settings.routeConfig.some((pattern) => matchesPattern(filename, pattern))
+  );
+}
+
+export function isFrameworkConfigFile(
+  context: TSESLint.RuleContext<string, readonly unknown[]>,
+  settings = getSettings(context),
+): boolean {
+  const filename = relativeFilename(context);
+  return (
+    filename !== undefined &&
+    settings.frameworkConfig.some((pattern) => matchesPattern(filename, pattern))
   );
 }
 

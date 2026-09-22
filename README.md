@@ -15,20 +15,40 @@ configuration.
 
 ## Rules
 
-| Rule                              | Purpose                                                                                                                                   | Config               |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| `no-action-only-routes`           | Warn when a route exports an action but cannot handle a refreshed `GET` request. Intentional action-only resource routes can be excluded. | Recommended          |
-| `no-conflicting-route-exports`    | In the opt-in RSC preset, find mutually exclusive client/server route exports.                                                            | RSC opt-in           |
-| `no-conflicting-route-paths`      | Find exact duplicate sibling paths, including paths introduced through `prefix()`.                                                        | Recommended          |
-| `no-duplicate-route-ids`          | Find repeated explicit route IDs in a static route configuration.                                                                         | Recommended          |
-| `no-duplicate-route-params`       | Find repeated parameter names in one effective route pattern.                                                                             | Recommended          |
-| `require-hydrate-fallback`        | Warn when `clientLoader.hydrate = true` has no `HydrateFallback` export.                                                                  | Strict               |
-| `require-root-error-boundary`     | Require the root route to export an `ErrorBoundary`.                                                                                      | Recommended          |
-| `safe-should-revalidate`          | Warn about trivially unconditional `shouldRevalidate` implementations that always return `false`.                                         | Strict               |
-| `valid-route-config`              | Validate statically understandable route helper calls and `RouteConfigEntry` object literals.                                             | Recommended          |
-| `valid-route-module-path`         | Check that static module paths referenced by `routes.ts` resolve to files.                                                                | Recommended          |
-| `no-invalid-route-exports`        | Find misspelled or unsupported route-module exports.                                                                                      | Strict               |
-| `resource-route-returns-response` | Require externally consumed resource routes to return a `Response`, with explicit file scoping.                                           | Strict, opt-in scope |
+| Rule                                        | Purpose                                                                                                                                   | Config               |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `consistent-route-module-extension`         | Enforce a configured extension policy for static route-module paths.                                                                      | Strict, opt-in       |
+| `no-action-form-default-method`             | Warn when a known action form omits `method` and therefore defaults to a browser GET.                                                     | Strict               |
+| `no-action-only-routes`                     | Warn when a route exports an action but cannot handle a refreshed `GET` request. Intentional action-only resource routes can be excluded. | Recommended          |
+| `no-browser-only-imports-in-server-exports` | Disallow explicitly client-only imports used by server route exports.                                                                     | Strict               |
+| `no-broad-action-origin`                    | Disallow universal or wildcard `allowedActionOrigins` entries.                                                                            | Strict, opt-in       |
+| `no-conflicting-route-exports`              | In the opt-in RSC preset, find mutually exclusive client/server route exports.                                                            | RSC opt-in           |
+| `no-conflicting-route-paths`                | Find exact duplicate sibling paths, including paths introduced through `prefix()`.                                                        | Recommended          |
+| `no-deprecated-react-router-api`            | Report APIs in the maintained React Router deprecation table with migration guidance.                                                     | Strict               |
+| `no-duplicate-route-ids`                    | Find repeated explicit route IDs in a static route configuration.                                                                         | Recommended          |
+| `no-duplicate-route-params`                 | Find repeated parameter names in one effective route pattern.                                                                             | Recommended          |
+| `no-multiple-middleware-next`               | Disallow two unconditional `next()` calls in one middleware invocation.                                                                   | Strict               |
+| `no-orphan-route-modules`                   | Find configured route-module files that are not referenced by the static route graph.                                                     | Strict               |
+| `no-resource-route-client-navigation`       | Require document navigation for statically scoped resource-route targets.                                                                 | Strict, opt-in       |
+| `no-route-manifest-collision`               | Disallow a lazy route manifest path that collides with a configured route.                                                                | Strict, opt-in       |
+| `no-sensitive-error-output`                 | Disallow raw error stacks or unknown errors rendered by route error boundaries.                                                           | Strict, opt-in       |
+| `no-server-only-imports-in-client-exports`  | Disallow explicit server-only or Node imports reached by client route exports.                                                            | Strict               |
+| `prefer-link-for-internal-navigation`       | Require `Link` instead of plain anchors for internal application navigation.                                                              | Strict               |
+| `require-hydrate-fallback`                  | Warn when `clientLoader.hydrate = true` has no `HydrateFallback` export.                                                                  | Strict               |
+| `require-outlet-for-child-routes`           | Warn when a configured parent with children has no statically visible outlet.                                                             | Strict               |
+| `require-resource-content-type`             | Require `Content-Type` for explicitly scoped resource Responses with non-empty bodies.                                                    | Strict, opt-in       |
+| `require-route-error-boundary`              | Require an error boundary at explicitly configured application boundaries.                                                                | Strict, opt-in       |
+| `require-root-error-boundary`               | Require the root route to export an `ErrorBoundary`.                                                                                      | Recommended          |
+| `return-server-middleware-response`         | Warn when server middleware discards the response returned by `next()`.                                                                   | Strict               |
+| `safe-should-revalidate`                    | Warn about trivially unconditional `shouldRevalidate` implementations that always return `false`.                                         | Strict               |
+| `valid-route-config`                        | Validate statically understandable route helper calls and `RouteConfigEntry` object literals.                                             | Recommended          |
+| `splittable-route-module`                   | Warn about top-level mutable state that can prevent client route-module splitting.                                                        | Strict               |
+| `valid-prerender-paths`                     | Validate static prerender paths and reject unresolved route parameters.                                                                   | Strict, opt-in       |
+| `valid-route-module`                        | Check that resolved route modules expose a meaningful route export.                                                                       | Strict               |
+| `valid-route-module-path`                   | Check that static module paths referenced by `routes.ts` resolve to files.                                                                | Recommended          |
+| `valid-route-params`                        | Check direct loader/action parameter reads against a configured route path.                                                               | Strict, opt-in       |
+| `no-invalid-route-exports`                  | Find misspelled or unsupported route-module exports.                                                                                      | Strict               |
+| `resource-route-returns-response`           | Require externally consumed resource routes to return a `Response`, with explicit file scoping.                                           | Strict, opt-in scope |
 
 The resource-route rule is intentionally narrow. React Router also supports
 resource routes consumed through fetchers or forms, where returning `data()` can
@@ -46,9 +66,9 @@ maintainer-controlled package name:
 
 ```sh
 npm install --save-dev eslint YOUR_PACKAGE_NAME
-# pnpm add --save-dev eslint YOUR_PACKAGE_NAME
-# yarn add --dev eslint YOUR_PACKAGE_NAME
-# bun add --dev eslint YOUR_PACKAGE_NAME
+pnpm add --save-dev eslint YOUR_PACKAGE_NAME
+yarn add --dev eslint YOUR_PACKAGE_NAME
+bun add --dev eslint YOUR_PACKAGE_NAME
 ```
 
 Until then, use a packed tarball from this repository (`pnpm build && pnpm pack`)
@@ -60,6 +80,8 @@ for local validation.
   rates.
 - `strict` extends the recommended checks with more opinionated rules. The
   response-contract rule still needs an explicit file scope.
+- `all` exposes every rule at warning severity for rule exploration. It is
+  intentionally unstable and should not be used in CI without review.
 
 The intended flat-config API is:
 
@@ -70,8 +92,8 @@ export default [reactRouter.configs.recommended];
 ```
 
 The package also exposes `configs["flat/recommended"]` and
-`configs["flat/strict"]` aliases for configuration styles that prefer explicit
-flat-config naming.
+`configs["flat/strict"]` and `configs["flat/all"]` aliases for configuration
+styles that prefer explicit flat-config naming.
 
 For a reviewed, higher-signal policy bundle:
 
@@ -95,6 +117,8 @@ export default [
         rootRoute: "packages/web/app/root.tsx",
         routeConfig: "packages/web/app/routes.ts",
         routeModuleFiles: ["packages/web/app/root.tsx", "packages/web/app/routes/**/*"],
+        routePaths: ["/teams/:teamId"],
+        resourceRoutePaths: ["/download/*"],
       },
     },
   },
@@ -108,6 +132,10 @@ export default [
 | Node.js      | `^22.23.2 \|\| ^24.21.0`                                                                                                              |
 | ESLint       | `^10.0.0`                                                                                                                             |
 | React Router | Framework-mode route modules and `@react-router/dev/routes` syntax; the plugin does not add React Router as a runtime peer dependency |
+
+Development and release tooling prioritize Node.js 24. Node.js 22 remains a
+supported compatibility line and is covered by CI. The development
+`@types/node` dependency follows the primary Node.js 24 line.
 
 The compatibility matrix is deliberately conservative while the package is a
 prerelease. React Router release validation and the previous-maintained-major
@@ -166,7 +194,7 @@ rule's contract.
 
 The detailed architecture, rule contracts, test strategy, packaging work,
 documentation requirements, and release phases are in [PLAN.md](./docs/PLAN.md).
-The prioritized backlog of possible future rules is in
+The implementation status and intentionally deferred ideas are in
 [RULE_IDEAS.md](./docs/RULE_IDEAS.md).
 
 Early feedback is particularly useful for:

@@ -32,6 +32,7 @@ export interface StaticRouteEntry {
   idNode?: TSESTree.Node;
   caseSensitive: boolean;
   isIndex: boolean;
+  hasChildren: boolean;
   siblingGroup: number;
   siblingPath?: string;
   fullPath?: string;
@@ -66,6 +67,7 @@ interface ParsedEntry {
   idNode?: TSESTree.Node;
   caseSensitive: boolean;
   isIndex: boolean;
+  hasChildren: boolean;
   children?: TSESTree.ArrayExpression;
   childrenUnknown: boolean;
 }
@@ -347,6 +349,7 @@ function parseEntry(
       idNode: idProperty?.value,
       caseSensitive: caseSensitive ?? false,
       isIndex: index === true,
+      hasChildren: Boolean(children),
       children,
       childrenUnknown,
     };
@@ -395,6 +398,7 @@ function parseEntry(
       pathNode: argumentsList[0] as TSESTree.Node | undefined,
       caseSensitive: false,
       isIndex: false,
+      hasChildren: Boolean(childrenResult.node),
       children: childrenResult.node,
       childrenUnknown: childrenResult.kind === "unknown",
     };
@@ -431,6 +435,7 @@ function parseEntry(
     fileNode,
     caseSensitive: false,
     isIndex: kind === "index",
+    hasChildren: Boolean(childrenResult.node),
     children: childrenResult.node,
     childrenUnknown: childrenResult.kind === "unknown",
   };
@@ -522,6 +527,7 @@ export function analyzeRouteConfig(program: TSESTree.Program): RouteConfigAnalys
         idNode: parsed.idNode,
         caseSensitive: parsed.caseSensitive,
         isIndex: parsed.isIndex,
+        hasChildren: parsed.hasChildren,
         siblingGroup,
         siblingPath,
         fullPath,

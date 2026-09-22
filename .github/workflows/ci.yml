@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [22.x, 24.x]
+        node: [24.x, 22.x]
 
     steps:
       - name: Check out repository

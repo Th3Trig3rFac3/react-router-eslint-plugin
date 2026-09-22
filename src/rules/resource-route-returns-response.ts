@@ -3,10 +3,13 @@ import type { TSESTree } from "@typescript-eslint/utils";
 import { createRule } from "../utils/create-rule.js";
 import { getExport } from "../utils/exports.js";
 import { getRouteModuleExports } from "../utils/route-module.js";
+import { matchesPattern, relativeFilename } from "../utils/settings.js";
 
 type Options = [
   {
     allowData?: boolean;
+    files?: string[];
+    allowFiles?: string[];
   }?,
 ];
 
@@ -124,6 +127,16 @@ export const resourceRouteReturnsResponseRule = createRule<Options, "missingResp
         type: "object",
         properties: {
           allowData: { type: "boolean" },
+          files: {
+            type: "array",
+            items: { type: "string" },
+            uniqueItems: true,
+          },
+          allowFiles: {
+            type: "array",
+            items: { type: "string" },
+            uniqueItems: true,
+          },
         },
         additionalProperties: false,
       },
@@ -140,6 +153,19 @@ export const resourceRouteReturnsResponseRule = createRule<Options, "missingResp
         const routeExports = getRouteModuleExports(context, program);
         if (!routeExports || routeExports.default) return;
 
+        const filename = relativeFilename(context);
+        const options = context.options[0] ?? {};
+        if (
+          (options.files &&
+            !options.files.some(
+              (pattern) => filename && matchesPattern(filename, pattern),
+            )) ||
+          options.allowFiles?.some(
+            (pattern) => filename && matchesPattern(filename, pattern),
+          )
+        ) {
+          return;
+        }
         const allowData = context.options[0]?.allowData ?? false;
         for (const handlerName of ["loader", "action", "clientLoader", "clientAction"]) {
           const handler = getExport(routeExports, handlerName);

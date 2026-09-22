@@ -4,6 +4,7 @@ import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
 import { resolveRouteModule } from "../utils/path-resolution.js";
+import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
 import { getCwd, getSettings, isRouteConfigFile } from "../utils/settings.js";
 
 type Options = [
@@ -212,6 +213,40 @@ export default createRule<Options, "unresolvedRouteModule">({
               }
             }
           }
+        }
+
+        // The visitor below handles the owning route-config file with the
+        // precise `relative()` base it can see. Imported static fragments are
+        // checked through the shared project index so results do not depend on
+        // ESLint's file traversal order.
+        for (const { entry, sourceFile, reportNode } of analyzeProjectRouteConfig(
+          context,
+          program,
+        ).entries) {
+          const currentFilename = context.filename ?? context.getFilename();
+          if (
+            !entry.file ||
+            !sourceFile ||
+            currentFilename === "<input>" ||
+            currentFilename === "<text>" ||
+            path.resolve(sourceFile) === path.resolve(currentFilename)
+          ) {
+            continue;
+          }
+          const result = resolveRouteModule(context, entry.file);
+          if (result.absolutePath) continue;
+          const candidates = result.candidates.map((candidate) =>
+            path.relative(getCwd(context), candidate).replaceAll("\\", "/"),
+          );
+          context.report({
+            node: reportNode,
+            messageId: "unresolvedRouteModule",
+            data: {
+              modulePath: entry.file,
+              candidates:
+                candidates.length > 0 ? candidates.join(", ") : "no safe candidates",
+            },
+          });
         }
       },
 

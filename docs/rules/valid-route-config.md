@@ -24,7 +24,8 @@ export default [index("./home.tsx"), route("settings", "./settings.tsx")];
 ```
 
 Dynamic route builders and unknown spreads are skipped. The rule never imports
-or executes route configuration. Analysis is currently limited to the route
-config file being linted; imported config fragments are not merged into a
-project-wide graph yet. It is intended to complement TypeScript for JavaScript
-projects and malformed generated configs.
+or executes route configuration. Relative imports inside the project root are
+parsed as route-config fragments with cycle/depth limits and cached by file
+metadata; package imports and unresolved dynamic fragments remain unknown. It
+is intended to complement TypeScript for JavaScript projects and malformed
+generated configs.

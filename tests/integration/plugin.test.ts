@@ -1,4 +1,5 @@
 import { ESLint } from "eslint";
+import path from "node:path";
 import parser from "@typescript-eslint/parser";
 import { describe, expect, it } from "vitest";
 
@@ -31,6 +32,7 @@ describe("plugin package", () => {
     );
     expect(plugin.configs).toHaveProperty("recommended");
     expect(plugin.configs).toHaveProperty("strict");
+    expect(plugin.configs).toHaveProperty("all");
     expect(plugin.configs).toHaveProperty("rsc");
   });
 
@@ -61,6 +63,33 @@ describe("plugin package", () => {
     expect(result?.messages).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ ruleId: "react-router/require-root-error-boundary" }),
+      ]),
+    );
+  });
+
+  it("indexes safe relative route-config fragments", async () => {
+    const fixture = path.resolve("tests/fixtures/graph-app");
+    const eslint = new ESLint({
+      cwd: fixture,
+      overrideConfigFile: true,
+      overrideConfig: [
+        plugin.configs.recommended as never,
+        {
+          files: ["**/*.ts"],
+          languageOptions: {
+            parser,
+            parserOptions: { ecmaVersion: "latest", sourceType: "module" },
+          },
+        },
+      ],
+    });
+
+    const [result] = await eslint.lintFiles(["app/routes.ts"]);
+    const ruleIds = result?.messages.map((message) => message.ruleId);
+    expect(ruleIds).toEqual(
+      expect.arrayContaining([
+        "react-router/no-conflicting-route-paths",
+        "react-router/no-duplicate-route-params",
       ]),
     );
   });

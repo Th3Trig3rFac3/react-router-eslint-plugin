@@ -28,10 +28,43 @@ export function createConfigs(plugin: TSESLint.FlatConfig.Plugin) {
     rules: {
       ...recommended.rules,
       "react-router/no-action-only-routes": "error",
+      "react-router/no-action-form-default-method": "warn",
+      "react-router/no-multiple-middleware-next": "error",
+      "react-router/return-server-middleware-response": "warn",
+      "react-router/valid-route-params": "warn",
+      "react-router/require-outlet-for-child-routes": "warn",
+      "react-router/no-resource-route-client-navigation": "warn",
       "react-router/no-invalid-route-exports": "error",
       "react-router/require-hydrate-fallback": "warn",
       "react-router/safe-should-revalidate": "warn",
+      "react-router/valid-route-module": "error",
+      "react-router/no-orphan-route-modules": "warn",
+      "react-router/valid-prerender-paths": "warn",
+      "react-router/no-route-manifest-collision": "warn",
+      "react-router/no-broad-action-origin": "warn",
+      "react-router/require-resource-content-type": "warn",
+      "react-router/no-sensitive-error-output": "warn",
+      "react-router/consistent-route-module-extension": "warn",
+      "react-router/no-deprecated-react-router-api": "warn",
+      "react-router/no-server-only-imports-in-client-exports": "error",
+      "react-router/no-browser-only-imports-in-server-exports": "error",
+      "react-router/splittable-route-module": "warn",
+      "react-router/require-route-error-boundary": "error",
+      "react-router/prefer-link-for-internal-navigation": "warn",
     },
+  } as const;
+
+  const all = {
+    name: "react-router/all",
+    files: SOURCE_FILES,
+    plugins: { "react-router": plugin },
+    settings: { reactRouter: DEFAULT_SETTINGS },
+    rules: Object.fromEntries(
+      Object.keys(plugin.rules ?? {}).map((ruleName) => [
+        `react-router/${ruleName}`,
+        "warn",
+      ]),
+    ),
   } as const;
 
   const rsc = {
@@ -47,9 +80,11 @@ export function createConfigs(plugin: TSESLint.FlatConfig.Plugin) {
   return {
     recommended,
     strict,
+    all,
     rsc,
     "flat/recommended": recommended,
     "flat/strict": strict,
+    "flat/all": all,
     "flat/rsc": rsc,
   };
 }

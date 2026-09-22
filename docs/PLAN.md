@@ -1,5 +1,10 @@
 # React Router ESLint Plugin — Implementation Plan
 
+> **Implementation status — 2026-09-22:** Checkboxes marked `[x]` are
+> implemented and covered by tests or package validation. Release decisions,
+> external application feedback, and publishing tasks remain unchecked until
+> they are completed by the maintainer.
+
 ## 1. Goal
 
 Build a production-quality ESLint plugin that catches common mistakes in React Router framework-mode route modules and route configuration files. The plugin should be useful to beginners through a low-noise `recommended` config and to larger applications through an intentionally more opinionated `strict` config.
@@ -53,8 +58,8 @@ review does not accidentally treat the provisional name as available.
 - Start with React Router framework-mode syntax used by the latest stable release and test the previous maintained major where practical.
 - Treat `react-router` and `@react-router/dev` as fixture/dev dependencies, not runtime peer dependencies. AST-based rules should not force users to install packages they do not otherwise need.
 - Set the ESLint peer range only after the compatibility matrix passes. The selected peer range is `^10.0.0`.
-- The package runtime floor is `>=22.23.2`; CI tests the exact minimum Node 22.23.2 and the current Node 24 line on Linux, Windows, and macOS. The build tool may require a newer development runtime than the published plugin does.
-- Keep `@types/node` development-only. Prefer declarations for the lowest supported runtime line so accidental use of newer Node APIs is caught during typechecking; the current v25 declaration set is an incidental scaffolding choice and does not expand the package's runtime support.
+- The package supports the Node.js 22 and 24 LTS lines through `^22.23.2 || ^24.21.0`; development and release tooling prioritize Node.js 24, while CI retains Node.js 22 coverage.
+- Keep `@types/node` development-only and aligned with the primary Node.js 24 development runtime. Node.js 22 compatibility must continue to be verified by CI rather than inferred from the type package version.
 - Prefer flat config. Do not add legacy eslintrc configs to a brand-new package unless user demand justifies their ongoing test burden.
 
 ### License
@@ -193,19 +198,19 @@ Because source code cannot always infer the consumer, keep this rule out of `rec
 
 Recognize `new Response(...)`, returned or thrown `Response` values, React Router `redirect(...)`, and configured response-producing helpers. For indirect calls or complex control flow, use TypeScript type information when available; otherwise avoid claiming certainty. Ensure every reachable, statically understood branch complies. Do not evaluate the function.
 
-### High-value follow-up candidates
+### High-value follow-up rules
 
-The expanded and prioritized backlog is maintained in
-[RULE_IDEAS.md](./RULE_IDEAS.md). Evaluate every candidate through a separate
-design issue before implementation. The initial shortlist is:
+The expanded implementation status and intentionally deferred ideas are
+maintained in [RULE_IDEAS.md](./RULE_IDEAS.md). The initial shortlist is now
+implemented with conservative static contracts:
 
-- `require-hydrate-fallback`: when client-loader hydration opts in, require the route's documented hydration fallback contract.
-- `no-conflicting-route-paths`: detect duplicate static sibling paths or indistinguishable route entries in `routes.ts`.
-- `valid-route-module`: extend path validation by parsing the target and verifying that it has at least one meaningful route-module export; keep this separate from path existence so diagnostics remain focused.
-- `require-route-error-boundary`: optionally require boundaries at configured application boundaries, not every route.
-- `no-duplicate-route-ids`: detect explicit duplicate IDs when route config APIs expose them.
-- `prefer-link-for-internal-navigation`: detect plain anchors to known internal routes, with exceptions for resource routes and `reloadDocument` use cases. This needs a careful JSX and URL contract and should not be an early rule.
-- `no-server-only-imports-in-client-exports`: trace dependencies of `clientLoader`/`clientAction` only if React Router's build checks do not already give a better diagnostic.
+- [x] `require-hydrate-fallback`: when client-loader hydration opts in, require the route's documented hydration fallback contract.
+- [x] `no-conflicting-route-paths`: detect duplicate static sibling paths or indistinguishable route entries in `routes.ts`.
+- [x] `valid-route-module`: extend path validation by parsing the target and verifying that it has at least one meaningful route-module export; keep this separate from path existence so diagnostics remain focused.
+- [x] `require-route-error-boundary`: optionally require boundaries at configured application boundaries, not every route.
+- [x] `no-duplicate-route-ids`: detect explicit duplicate IDs when route config APIs expose them.
+- [x] `prefer-link-for-internal-navigation`: detect plain anchors to known internal routes, with exceptions for resource routes and `reloadDocument` use cases. This needs a careful JSX and URL contract and should not be an early rule.
+- [x] `no-server-only-imports-in-client-exports`: trace dependencies of `clientLoader`/`clientAction` only if React Router's build checks do not already give a better diagnostic.
 
 Reject ideas that merely restate TypeScript errors, duplicate React Router build-time checks, or require application-specific policy without configurable scope.
 
@@ -477,10 +482,18 @@ Exit criterion: `recommended` produces actionable results with an agreed false-p
 
 - [x] Implement and validate the static `no-invalid-route-exports` rule.
 - [x] Prototype `resource-route-returns-response` with scoped options and static tests.
-- [ ] Decide which follow-up candidates provide value beyond React Router/TypeScript diagnostics.
+  - [x] Implement the follow-up candidates with explicit scope and uncertainty handling.
 - [x] Publish strict config semantics and migration examples in the README/docs.
 
 Exit criterion: every strict diagnostic represents a documented policy, and context-dependent rules require explicit scope.
+
+### Implementation status
+
+- [x] Implement all actionable rule ideas from `RULE_IDEAS.md`.
+- [x] Implement all repairs listed in `repair.md`.
+- [x] Add the parser-backed, project-bounded route-config graph with caching and cycle/depth protection.
+- [x] Add rule documentation, README entries, focused tests, and the `all` configuration.
+- [x] Verify formatting, linting, typechecking, tests, documentation indexes, and package publishability.
 
 ### Phase 5 — prerelease and stable release
 

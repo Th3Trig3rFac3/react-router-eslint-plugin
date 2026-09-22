@@ -1,5 +1,9 @@
 # Repair backlog
 
+> **Status — 2026-09-22:** Every repair item in this document is complete.
+> The checked completion list below records the verification performed for the
+> implementation.
+
 These are concrete mismatches or misleading contracts found while reviewing
 [RULE_IDEAS.md](RULE_IDEAS.md). Verify behavior with focused tests before
 changing a rule. Keep this list separate from speculative new-rule ideas.
@@ -39,10 +43,12 @@ once regardless of ESLint file order. Add fixtures with two imported fragments,
 one duplicate across them, and one unresolved dynamic fragment that is skipped.
 Never import or execute application code.
 
-**Status:** The documentation scope correction is implemented. The
-project-wide index remains deferred until the plugin has a parser-backed,
-file-order-independent analyzer; the current rules intentionally stay
-file-local and do not claim cross-file coverage.
+**Status:** Implemented. Route-config rules use a cached parser-backed project
+index for relative fragments inside the configured project root. The index has
+real-path boundary checks, cycle/depth limits, modification-aware caching, and
+skips unresolved/dynamic fragments without executing application code. Reports
+for imported declarations are anchored to the owning `routes.ts` file because
+ESLint only owns the current source tree.
 
 ## 3. Clarify the hydration fallback policy
 
@@ -80,7 +86,7 @@ range, and `docs:check` now verifies that row against `package.json`.
 
 ## Completion checks
 
-- Focused regression tests cover each changed rule contract.
-- `pnpm docs:check`, `pnpm format`, `pnpm lint`, `pnpm typecheck`, and the normal
-  test suite pass after implementation changes.
-- Rule pages and the README describe the behavior actually shipped.
+- [x] Focused regression tests cover each changed rule contract.
+- [x] `pnpm docs:check`, `pnpm format`, `pnpm lint`, `pnpm typecheck`, and the normal
+      test suite pass after implementation changes.
+- [x] Rule pages and the README describe the behavior actually shipped.

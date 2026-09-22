@@ -15,6 +15,9 @@ export interface ReactRouterSettings {
   appDirectory?: string;
   rootRoute?: string | string[];
   routeConfig?: string | string[];
+  frameworkConfig?: string | string[];
+  routePaths?: string | string[];
+  resourceRoutePaths?: string | string[];
   routeModuleFiles?: string | string[];
   extensions?: string[];
 }
@@ -23,6 +26,9 @@ export interface NormalizedReactRouterSettings {
   appDirectory: string;
   rootRoute: string[];
   routeConfig: string[];
+  frameworkConfig: string[];
+  routePaths: string[];
+  resourceRoutePaths: string[];
   routeModuleFiles: string[];
   extensions: string[];
 }

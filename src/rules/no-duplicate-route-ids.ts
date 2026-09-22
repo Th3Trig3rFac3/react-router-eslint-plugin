@@ -1,7 +1,7 @@
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { analyzeRouteConfig } from "../utils/route-config.js";
+import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
 import { isRouteConfigFile } from "../utils/settings.js";
 
 export default createRule<[], "duplicateRouteId">({
@@ -24,10 +24,11 @@ export default createRule<[], "duplicateRouteId">({
       Program(program: TSESTree.Program) {
         if (!isRouteConfigFile(context)) return;
         const byId = new Map<string, Array<{ node: TSESTree.Node; id: string }>>();
-        for (const entry of analyzeRouteConfig(program).entries) {
+        for (const { entry, reportNode } of analyzeProjectRouteConfig(context, program)
+          .entries) {
           if (entry.id === undefined || !entry.idNode) continue;
           const declarations = byId.get(entry.id) ?? [];
-          declarations.push({ node: entry.idNode, id: entry.id });
+          declarations.push({ node: reportNode, id: entry.id });
           byId.set(entry.id, declarations);
         }
 

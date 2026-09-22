@@ -1,7 +1,8 @@
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { analyzeRouteConfig, type RouteConfigIssueCode } from "../utils/route-config.js";
+import { type RouteConfigIssueCode } from "../utils/route-config.js";
+import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
 import { isRouteConfigFile } from "../utils/settings.js";
 
 export default createRule<[], RouteConfigIssueCode>({
@@ -38,9 +39,9 @@ export default createRule<[], RouteConfigIssueCode>({
     return {
       Program(program: TSESTree.Program) {
         if (!isRouteConfigFile(context)) return;
-        const analysis = analyzeRouteConfig(program);
-        for (const issue of analysis.issues) {
-          context.report({ node: issue.node, messageId: issue.code });
+        const analysis = analyzeProjectRouteConfig(context, program);
+        for (const { issue, reportNode } of analysis.issues) {
+          context.report({ node: reportNode, messageId: issue.code });
         }
       },
     };

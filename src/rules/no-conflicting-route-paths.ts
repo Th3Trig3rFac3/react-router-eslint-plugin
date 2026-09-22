@@ -1,7 +1,8 @@
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { analyzeRouteConfig, canonicalRoutePath } from "../utils/route-config.js";
+import { canonicalRoutePath } from "../utils/route-config.js";
+import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
 import { isRouteConfigFile } from "../utils/settings.js";
 
 export default createRule<[], "conflictingRoutePath">({
@@ -28,7 +29,8 @@ export default createRule<[], "conflictingRoutePath">({
           string,
           Array<{ entryNode: TSESTree.Node; path: string }>
         >();
-        for (const entry of analyzeRouteConfig(program).entries) {
+        for (const { entry, reportNode } of analyzeProjectRouteConfig(context, program)
+          .entries) {
           // Layout and pathless routes do not themselves match a URL. Index
           // routes do match their parent's URL, even though they have no path.
           if (entry.kind === "layout") continue;
@@ -38,7 +40,7 @@ export default createRule<[], "conflictingRoutePath">({
           const key = `${entry.siblingGroup}:${entry.caseSensitive ? "s" : "i"}:${canonicalRoutePath(entry.fullPath, entry.caseSensitive)}`;
           const declarations = byPath.get(key) ?? [];
           declarations.push({
-            entryNode: entry.pathNode ?? entry.node,
+            entryNode: reportNode,
             path: entry.fullPath || "/",
           });
           byPath.set(key, declarations);
