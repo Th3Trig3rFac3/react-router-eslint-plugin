@@ -193,6 +193,18 @@ export function isLikelyRouteModule(
     filename !== undefined &&
     settings.routeModuleFiles.some((pattern) => matchesPattern(filename, pattern))
   ) {
+    // React Router treats `.server`/`.client` files as shared graph modules,
+    // not route modules, and common file-route conventions use a `+` prefix
+    // for colocated helpers. A broad `app/routes/**/*` default must not turn
+    // those support files into route exports.
+    const segments = filename.split("/");
+    const basename = segments.at(-1) ?? "";
+    if (
+      /\.(?:server|client)\.(?:js|jsx|ts|tsx|mjs|cjs|mts|cts)$/.test(basename) ||
+      segments.some((segment) => segment.startsWith("+"))
+    ) {
+      return false;
+    }
     return true;
   }
 

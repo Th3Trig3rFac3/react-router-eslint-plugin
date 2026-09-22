@@ -9,6 +9,7 @@ ruleTester.run("no-invalid-route-exports", rule, {
         export const loader = () => ({ ok: true });
         export const middleware = [];
         export const clientMiddleware = [];
+        export const ServerHydrateFallback = () => null;
         export const handle = { crumb: "Home" };
         export default function Home() { return null; }
       `,
@@ -25,6 +26,14 @@ ruleTester.run("no-invalid-route-exports", rule, {
     {
       filename: "app/routes/reexport.tsx",
       code: `export * from "./shared";`,
+    },
+    {
+      filename: "app/routes/auth.server.ts",
+      code: `export const loginErrorMessage = () => ({});`,
+    },
+    {
+      filename: "app/routes/+shared/forms.tsx",
+      code: `export const FormSchema = {};`,
     },
   ],
   invalid: [

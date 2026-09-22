@@ -25,6 +25,7 @@ const OFFICIAL_EXPORTS = new Set([
   "ServerComponent",
   "ServerErrorBoundary",
   "ServerHeaders",
+  "ServerHydrateFallback",
   "ServerLayout",
   "ServerLoader",
   "ServerMiddleware",

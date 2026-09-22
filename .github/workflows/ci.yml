@@ -40,3 +40,34 @@ jobs:
       - name: Validate package exports
         if: matrix.os == 'ubuntu-latest'
         run: pnpm package:check
+
+  eslint-boundary:
+    name: ESLint ${{ matrix.eslint }} / Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        eslint: [10.0.0, 10.11.0]
+        node: [24.x, 22.x]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/setup@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install ESLint boundary
+        run: pnpm add --save-dev --ignore-workspace-root-check eslint@${{ matrix.eslint }}
+
+      - name: Run compatibility checks
+        run: pnpm run ci

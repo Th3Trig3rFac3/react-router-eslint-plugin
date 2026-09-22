@@ -266,6 +266,12 @@ Configuration changes that create new diagnostics require deliberate semver trea
 ├── docs/
 │   ├── PLAN.md
 │   ├── RULE_IDEAS.md
+│   ├── compatibility.md
+│   ├── rfcs/
+│   │   ├── README.md
+│   │   └── <mvp-rule>.md
+│   ├── validation/
+│   │   └── mvp-semantics.md
 │   └── rules/
 │       ├── no-action-only-routes.md
 │       ├── no-invalid-route-exports.md
@@ -274,6 +280,7 @@ Configuration changes that create new diagnostics require deliberate semver trea
 │       └── valid-route-module-path.md
 ├── scripts/
 │   ├── generate-rule-docs.ts
+│   ├── validate-mvp-apps.ts
 │   └── verify-rule-index.ts
 ├── src/
 │   ├── configs/
@@ -443,9 +450,9 @@ Each rule gets a dedicated page with: summary, rationale, when not to use it, op
 - [ ] Confirm owner, final package name, npm scope, and community/official
       status.
 - [ ] Confirm Apache-2.0 versus an owner-approved switch to MIT.
-- [ ] Record latest and previous supported React Router, ESLint, and Node versions.
-- [ ] Write short rule RFCs with examples for the MVP set.
-- [ ] Validate rule semantics against official React Router docs and at least three representative applications.
+- [x] Record latest and previous supported React Router, ESLint, and Node versions.
+- [x] Write short rule RFCs with examples for the MVP set.
+- [x] Validate rule semantics against official React Router docs and at least three representative applications.
 
 Exit criterion: naming, licensing, supported versions, and MVP behavior are unambiguous.
 
@@ -473,7 +480,7 @@ Exit criterion: analyzers cover all documented static examples without executing
 - [x] Implement `require-root-error-boundary`.
 - [x] Implement `valid-route-module-path`.
 - [x] Implement `no-action-only-routes` with intentional-resource exceptions.
-- [ ] Run against representative apps; classify and fix every false positive.
+- [x] Run against representative apps; classify and fix every false positive.
 - [x] Add rule docs and verify the README rule table in CI.
 
 Exit criterion: `recommended` produces actionable results with an agreed false-positive threshold and no crashes.

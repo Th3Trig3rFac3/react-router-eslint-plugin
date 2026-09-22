@@ -141,6 +141,10 @@ The compatibility matrix is deliberately conservative while the package is a
 prerelease. React Router release validation and the previous-maintained-major
 fixture set are release gates, not assumptions hidden in the rules.
 
+See [`docs/compatibility.md`](./docs/compatibility.md) for the dated latest and
+previous React Router, ESLint, and Node.js evidence, exact CI boundaries, and
+the three application validation report.
+
 ## What the first rules catch
 
 Action-only UI route:
