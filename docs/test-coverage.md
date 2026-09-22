@@ -18,13 +18,13 @@ baseline is:
 
 | Metric     |                 Result |
 | ---------- | ---------------------: |
-| Statements | 81.49% (1,453 / 1,783) |
-| Branches   | 73.72% (1,434 / 1,945) |
-| Functions  |     91.53% (238 / 260) |
-| Lines      | 86.90% (1,301 / 1,497) |
+| Statements | 81.37% (1,455 / 1,788) |
+| Branches   | 73.62% (1,429 / 1,941) |
+| Functions  |     91.63% (241 / 263) |
+| Lines      | 86.73% (1,301 / 1,500) |
 
 The [Vitest configuration](../vitest.config.ts) writes text, JSON summary, and
-HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24
+HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24.21.0
 CI matrix entry. No minimum threshold is enforced yet: the baseline should be
 used to choose meaningful thresholds after the highest-value branches are
 covered, rather than making a blanket 100% target that rewards duplicate cases.

@@ -17,6 +17,37 @@ export interface ResolvedRouteModule {
   candidates: string[];
 }
 
+function isWithinRoot(root: string, candidate: string): boolean {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate));
+  return !(
+    relative === ".." ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative)
+  );
+}
+
+/**
+ * Check a project boundary using both lexical and real paths. macOS commonly
+ * exposes temporary directories through a symlink such as `/var` -> `/private/var`;
+ * comparing only one spelling incorrectly rejects files inside the project.
+ */
+export function isPathInsideProject(projectRoot: string, candidate: string): boolean {
+  if (isWithinRoot(projectRoot, candidate)) return true;
+  try {
+    return isWithinRoot(fs.realpathSync(projectRoot), fs.realpathSync(candidate));
+  } catch {
+    return false;
+  }
+}
+
+export function canonicalPath(filename: string): string {
+  try {
+    return path.normalize(fs.realpathSync(filename));
+  } catch {
+    return path.normalize(path.resolve(filename));
+  }
+}
+
 export function resolveRouteModule(
   context: TSESLint.RuleContext<string, readonly unknown[]>,
   moduleSpecifier: string,
@@ -34,12 +65,7 @@ export function resolveRouteModule(
   const withoutQuery = moduleSpecifier.split(/[?#]/u, 1)[0] ?? moduleSpecifier;
   const requested = path.resolve(baseDirectory, withoutQuery);
   const projectRoot = path.resolve(getCwd(context));
-  const relativeToProject = path.relative(projectRoot, requested);
-  if (
-    relativeToProject === ".." ||
-    relativeToProject.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativeToProject)
-  ) {
+  if (!isPathInsideProject(projectRoot, requested)) {
     return { candidates: [] };
   }
   const candidates = path.extname(requested)
@@ -50,12 +76,7 @@ export function resolveRouteModule(
     try {
       if (fs.statSync(candidate).isFile()) {
         const realCandidate = fs.realpathSync(candidate);
-        const relativeRealPath = path.relative(projectRoot, realCandidate);
-        if (
-          relativeRealPath === ".." ||
-          relativeRealPath.startsWith(`..${path.sep}`) ||
-          path.isAbsolute(relativeRealPath)
-        ) {
+        if (!isPathInsideProject(projectRoot, realCandidate)) {
           continue;
         }
         return { absolutePath: realCandidate, candidates };

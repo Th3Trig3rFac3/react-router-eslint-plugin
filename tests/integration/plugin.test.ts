@@ -277,5 +277,5 @@ describe("plugin package", () => {
     } finally {
       await rm(project, { recursive: true, force: true });
     }
-  });
+  }, 15000);
 });

@@ -5,7 +5,7 @@ import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
 import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
-import { resolveRouteModule } from "../utils/path-resolution.js";
+import { canonicalPath, resolveRouteModule } from "../utils/path-resolution.js";
 import {
   getCwd,
   getSettings,
@@ -84,8 +84,7 @@ export default createRule<Options, "orphanRouteModule">({
         for (const { entry } of analysis.entries) {
           if (!entry.file) continue;
           const resolved = resolveRouteModule(context, entry.file);
-          if (resolved.absolutePath)
-            referenced.add(path.normalize(resolved.absolutePath));
+          if (resolved.absolutePath) referenced.add(canonicalPath(resolved.absolutePath));
         }
 
         const options = context.options[0] ?? {};
@@ -106,7 +105,7 @@ export default createRule<Options, "orphanRouteModule">({
           ) {
             continue;
           }
-          if (referenced.has(path.normalize(absolute))) continue;
+          if (referenced.has(canonicalPath(absolute))) continue;
           context.report({
             node: program,
             messageId: "orphanRouteModule",

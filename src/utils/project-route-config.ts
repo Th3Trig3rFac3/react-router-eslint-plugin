@@ -10,6 +10,7 @@ import {
   type RouteConfigIssue,
   type StaticRouteEntry,
 } from "./route-config.js";
+import { isPathInsideProject } from "./path-resolution.js";
 import { getCwd, getSettings } from "./settings.js";
 
 interface ParserModule {
@@ -59,15 +60,7 @@ const parsedCache = new Map<
 
 function safeProjectPath(projectRoot: string, candidate: string): string | undefined {
   const absolute = path.resolve(candidate);
-  const relative = path.relative(projectRoot, absolute);
-  if (
-    relative === ".." ||
-    relative.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relative)
-  ) {
-    return undefined;
-  }
-  return absolute;
+  return isPathInsideProject(projectRoot, absolute) ? absolute : undefined;
 }
 
 function resolveLocalFile(
