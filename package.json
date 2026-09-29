@@ -95,7 +95,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "docs:check": "tsx scripts/verify-rule-index.ts",
-    "package:check": "pnpm build && tsx scripts/verify-package.ts && publint && attw --pack",
+    "package:check": "pnpm build && tsx scripts/verify-package.ts && publint && tsx scripts/check-package-types.ts",
     "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm docs:check && pnpm build"
   },
   "publishConfig": {
