@@ -240,7 +240,7 @@ earlier or clearer than the build diagnostic.
 
 ## Implementation order completed
 
-- [x] Validate and repair current rule contracts listed in [repair.md](repair.md).
+- [x] Validate and repair current rule contracts.
 - [x] Implement `no-multiple-middleware-next` using local route-module syntax.
 - [x] Build and use a cached, parser-backed project graph for imported route fragments and
       referenced route modules. Keep resolution independent of ESLint file order.

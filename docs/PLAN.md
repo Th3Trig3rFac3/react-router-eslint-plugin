@@ -497,7 +497,7 @@ Exit criterion: every strict diagnostic represents a documented policy, and cont
 ### Implementation status
 
 - [x] Implement all actionable rule ideas from `RULE_IDEAS.md`.
-- [x] Implement all repairs listed in `repair.md`.
+- [x] Validate and repair the rule contracts.
 - [x] Add the parser-backed, project-bounded route-config graph with caching and cycle/depth protection.
 - [x] Add rule documentation, README entries, focused tests, and the `all` configuration.
 - [x] Verify formatting, linting, typechecking, tests, documentation indexes, and package publishability.
