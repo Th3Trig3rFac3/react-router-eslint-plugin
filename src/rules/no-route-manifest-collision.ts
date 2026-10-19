@@ -43,7 +43,16 @@ export default createRule<Options, "manifestCollision">({
     return {
       Program(program: TSESTree.Program) {
         if (!isFrameworkConfigFile(context)) return;
-        const manifest = getFrameworkConfigValue(program, "manifestPath");
+        const discovery = getFrameworkConfigValue(program, "routeDiscovery");
+        if (!discovery || discovery.value.type !== "ObjectExpression") return;
+        const mode = getFrameworkConfigValue(program, "mode", discovery.value);
+        const modeValue = mode && staticString(mode.value);
+        if (mode && modeValue !== "lazy") return;
+        const manifest = getFrameworkConfigValue(
+          program,
+          "manifestPath",
+          discovery.value,
+        );
         const manifestPath = manifest && staticString(manifest.value);
         if (!manifest || manifestPath === undefined) return;
         const options = context.options[0] ?? {};

@@ -1,15 +1,18 @@
 # no-broad-action-origin
 
-Disallow universal wildcard values in `allowedActionOrigins` inside
-`react-router.config.ts`. A wildcard weakens the origin allowlist and should be
-an explicit, reviewed security decision.
+Disallow wildcard entries in the statically visible `allowedActionOrigins`
+array in the default export of `react-router.config.ts`. React Router accepts
+glob patterns for these origins; this rule flags any literal entry containing
+`*` for explicit review.
 
 ```ts
 export default {
-  allowedActionOrigins: ["https://example.com"],
+  allowedActionOrigins: ["example.com", "*.example.com"],
 };
 ```
 
-The rule reports literal `*`, `*.example.test`, and `https://*` entries. Dynamic
-configuration is skipped. Use `allow` for a deliberate exception and document
-why it is safe.
+The rule reports `*`, `*.example.com`, `**.example.com`, and other literal
+patterns containing `*`. It follows simple top-level `const` aliases, including
+the config object and the origins array. Standalone named exports, dynamic
+expressions, spreads, and computed properties are not treated as configuration.
+Use `allow` for a deliberate exception and document why it is safe.

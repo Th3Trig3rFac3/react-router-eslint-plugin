@@ -116,6 +116,31 @@ describe("plugin package", () => {
     ]);
   });
 
+  it("parses TSX with the documented parser setup and reports route diagnostics", async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: [
+        {
+          files: ["**/*.tsx"],
+          languageOptions: {
+            parser,
+            parserOptions: { ecmaFeatures: { jsx: true } },
+          },
+          plugins: { "react-router": plugin as never },
+          rules: { "react-router/no-action-only-routes": "error" },
+        },
+      ],
+    });
+    const [result] = await eslint.lintText(
+      `const jsx = <main />;\nexport async function action() { return null; }`,
+      { filePath: "app/routes/example.tsx" },
+    );
+    expect(result?.fatalErrorCount).toBe(0);
+    expect(result?.messages.map((message) => message.ruleId)).toContain(
+      "react-router/no-action-only-routes",
+    );
+  });
+
   it("loads through ESLint flat config", async () => {
     const eslint = new ESLint({
       overrideConfigFile: true,

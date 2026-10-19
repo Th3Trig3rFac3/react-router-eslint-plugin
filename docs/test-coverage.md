@@ -1,35 +1,34 @@
 # Test coverage review
 
-Reviewed on 2026-09-22 against the current working tree. This document records
-the measured test baseline, the testing work completed from the review, and the
-remaining improvements that are useful for this static-analysis plugin.
+Reviewed on 2026-10-06 against the current working tree. This document records
+the current measured baseline and the remaining improvements that are useful
+for this static-analysis plugin.
 
 ## Current result and measurement
 
-`pnpm test` passes with **33 test files and 152 tests**. The test run used
-Windows and Node.js 26.9.0. Node 26 is outside the package's declared support
-range (`^22.23.2 || ^24.21.0`), so the local result does not replace the CI
-compatibility matrix.
+`pnpm test` passes with **34 test files and 172 tests**. The test run used
+Windows and Node.js 24.21.0, the lower patch of the supported Node.js 24 line.
+It does not replace the cross-platform or minimum ESLint boundary matrix.
 
-`pnpm test:coverage` runs the same 152 tests with the V8 provider and includes
+`pnpm test:coverage` runs the same 172 tests with the V8 provider and includes
 all runtime TypeScript sources under `src/**/*.ts`. `src/types.ts` is excluded
 because it contains type declarations and no runtime behavior. The current
 baseline is:
 
 | Metric     |                 Result |
 | ---------- | ---------------------: |
-| Statements | 81.37% (1,455 / 1,788) |
-| Branches   | 73.62% (1,429 / 1,941) |
-| Functions  |     91.63% (241 / 263) |
-| Lines      | 86.73% (1,301 / 1,500) |
+| Statements | 82.12% (1,493 / 1,818) |
+| Branches   | 74.55% (1,480 / 1,985) |
+| Functions  |     91.30% (252 / 276) |
+| Lines      | 87.35% (1,333 / 1,526) |
 
 The [Vitest configuration](../vitest.config.ts) writes text, JSON summary, and
-HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24.21.0
+HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24
 CI matrix entry. No minimum threshold is enforced yet: the baseline should be
 used to choose meaningful thresholds after the highest-value branches are
 covered, rather than making a blanket 100% target that rewards duplicate cases.
 
-There are **32 rule suites and 5 integration tests**. The plugin exports **33
+There are **32 rule suites and 11 integration tests**. The plugin exports **33
 rule names backed by 32 distinct implementations** because
 `valid-resource-route` aliases `resource-route-returns-response`. Every distinct
 implementation now has a dedicated test suite or equivalent integration
@@ -46,7 +45,7 @@ with JSX enabled. Rule suites cover both accepted code and reported diagnostics.
 | Route module validity and orphan detection | `valid-route-module` covers component, loader, named re-export, type-only, missing, allowlisted, and comment/string false-positive cases. `no-orphan-route-modules` covers referenced, orphaned, root, allowlisted, ignored, dynamic, incomplete, malformed, outside-root, and cyclic graphs.                                             | These checks intentionally skip dynamic or uncertain graphs; they do not attempt to execute application route discovery.                                                                                                               |
 | Route exports and lifecycle rules          | Action-only modules, conflicting/invalid exports, boundaries, hydration, resource responses, revalidation, middleware, navigation, and import boundaries have valid/invalid cases. Import-boundary tests now distinguish server/client reachability, helper chains, type-only imports, side effects, configured packages, and exemptions. | Lower branch coverage remains in rules with many syntax-specific paths, especially `no-action-form-default-method`, `no-resource-route-client-navigation`, `require-outlet-for-child-routes`, and `return-server-middleware-response`. |
 | Cross-file behavior                        | The graph fixture and temporary-project tests cover shared fragments, cycles, malformed and missing imports, outside-root imports, and cache invalidation after a fragment changes in the same ESLint process.                                                                                                                            | Application-level module resolution and bundler behavior are outside this package's ownership.                                                                                                                                         |
-| Public plugin contract                     | Integration tests assert the complete rule registry, alias identity, flat-config aliases, preset contents and severities, `all`, and representative `strict` and `rsc` lint behavior.                                                                                                                                                     | The package checks still run separately from Vitest; they should remain separate because they validate built artifacts and published metadata.                                                                                         |
+| Public plugin and documentation contract   | Integration tests assert the complete registry, alias identity, presets, TSX parser setup, and README/docs-index behavior, including temporary checks for missing pages, stale rules, wrong labels, and support-range drift.                                                                                                              | Package export and tarball validation still runs separately because it checks built artifacts and published metadata.                                                                                                                  |
 | Shared utilities                           | Utility behavior is exercised through rules and integration tests. Coverage reports make remaining paths visible, including lower branch coverage in `ast.ts`, `exports.ts`, and parts of route analysis.                                                                                                                                 | Dedicated utility tests are only useful for a contract that cannot be expressed clearly through a rule.                                                                                                                                |
 
 The graph analyzer now treats recursive imports as uncertain for orphan checks.
@@ -100,7 +99,7 @@ without requiring tests for unreachable defensive code.
   The important behavior is the existing conservative silence, which is covered
   by the dynamic, incomplete, malformed, outside-root, and cyclic cases.
 
-The project now has a measured coverage baseline and regression protection for
-the plugin-specific graph, rule, and preset behavior. Future tests should target
-the remaining decision branches or a concrete bug, rather than increase the
-test count by repetition.
+The updated baseline includes regressions for framework-config ownership,
+nested manifest paths, object-form prerender paths, and documentation drift.
+Future tests should target remaining decision branches or a concrete bug,
+rather than increase the test count by repetition.

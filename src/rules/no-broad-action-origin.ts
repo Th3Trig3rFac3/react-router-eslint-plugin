@@ -1,7 +1,7 @@
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { getFrameworkConfigValue, staticStringArray } from "../utils/framework-config.js";
+import { getFrameworkConfigValue } from "../utils/framework-config.js";
 import { isFrameworkConfigFile } from "../utils/settings.js";
 import { staticString, unwrap } from "../utils/ast.js";
 
@@ -12,7 +12,7 @@ type Options = [
 ];
 
 function broadOrigin(origin: string): boolean {
-  return origin === "*" || origin.startsWith("*.") || /:\/\/\*(?:$|[:/])/u.test(origin);
+  return origin.includes("*");
 }
 
 export default createRule<Options, "broadOrigin">({
@@ -47,26 +47,24 @@ export default createRule<Options, "broadOrigin">({
         if (!value) return;
         const options = context.options[0] ?? {};
         const expression = unwrap(value.value);
-        const values = staticStringArray(expression);
-        if (values) {
-          for (const origin of values) {
-            if (broadOrigin(origin) && !options.allow?.includes(origin)) {
-              context.report({
-                node: value.node,
-                messageId: "broadOrigin",
-                data: { origin },
-              });
-            }
+        const origins =
+          expression.type === "ArrayExpression"
+            ? expression.elements.flatMap((element) => {
+                if (!element || element.type === "SpreadElement") return [];
+                const origin = staticString(element);
+                return origin === undefined ? [] : [origin];
+              })
+            : [staticString(expression)].filter(
+                (origin): origin is string => origin !== undefined,
+              );
+        for (const origin of origins) {
+          if (broadOrigin(origin) && !options.allow?.includes(origin)) {
+            context.report({
+              node: value.node,
+              messageId: "broadOrigin",
+              data: { origin },
+            });
           }
-          return;
-        }
-        const origin = staticString(expression);
-        if (origin && broadOrigin(origin) && !options.allow?.includes(origin)) {
-          context.report({
-            node: value.node,
-            messageId: "broadOrigin",
-            data: { origin },
-          });
         }
       },
     };

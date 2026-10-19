@@ -1,6 +1,6 @@
 # React Router ESLint Plugin — Implementation Plan
 
-> **Implementation status — 2026-09-22:** Checkboxes marked `[x]` are
+> **Implementation status — 2026-10-06:** Checkboxes marked `[x]` are
 > implemented and covered by tests or package validation. Release decisions,
 > external application feedback, and publishing tasks remain unchecked until
 > they are completed by the maintainer.
@@ -57,7 +57,7 @@ review does not accidentally treat the provisional name as available.
 
 - Start with React Router framework-mode syntax used by the latest stable release and test the previous maintained major where practical.
 - Treat `react-router` and `@react-router/dev` as fixture/dev dependencies, not runtime peer dependencies. AST-based rules should not force users to install packages they do not otherwise need.
-- Set the ESLint peer range only after the compatibility matrix passes. The selected peer range is `^10.0.0`.
+- Keep the ESLint peer range at `^10.4.0`; CI checks the minimum and current versions against both supported Node.js boundary versions.
 - The package supports the Node.js 22 and 24 LTS lines through `^22.23.2 || ^24.21.0`; development and release tooling prioritize Node.js 24, while CI retains Node.js 22 coverage.
 - Keep `@types/node` development-only and aligned with the primary Node.js 24 development runtime. Node.js 22 compatibility must continue to be verified by CI rather than inferred from the type package version.
 - Prefer flat config. Do not add legacy eslintrc configs to a brand-new package unless user demand justifies their ongoing test burden.

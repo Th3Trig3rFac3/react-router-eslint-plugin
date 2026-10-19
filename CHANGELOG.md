@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Restrict framework-config rule analysis to the default-exported config and
+  recognize nested route-discovery manifests and object-form prerender paths.
+- Detect all literal wildcard action-origin patterns, including multi-segment
+  globs, while skipping ambiguous configuration expressions.
+
+### Documentation
+
+- Add TypeScript and TSX flat-config setup guidance and make the rule index and
+  compatibility claims follow the exported plugin and package metadata.
+
 ## 0.1.1
 
 ### Added

@@ -7,12 +7,12 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^24.21.0",
+      "version": "^24.22.0",
       "onFail": "download"
     },
     "packageManager": {
       "name": "pnpm",
-      "version": "^12.8.1",
+      "version": "^12.11.2",
       "onFail": "download"
     }
   },
@@ -64,24 +64,24 @@
     "eslint": "^10.4.0"
   },
   "dependencies": {
-    "@typescript-eslint/parser": "^8.70.1",
-    "@typescript-eslint/utils": "^8.70.1"
+    "@typescript-eslint/parser": "^8.71.2",
+    "@typescript-eslint/utils": "^8.71.2"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
-    "@types/node": "^24.19.0",
-    "@typescript-eslint/eslint-plugin": "^8.70.1",
-    "@typescript-eslint/rule-tester": "^8.70.1",
-    "@vitest/coverage-v8": "^5.0.2",
-    "eslint": "^10.11.0",
+    "@types/node": "^24.19.2",
+    "@typescript-eslint/eslint-plugin": "^8.71.2",
+    "@typescript-eslint/rule-tester": "^8.71.2",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.13.0",
     "eslint-plugin-eslint-plugin": "^7.6.2",
-    "prettier": "^3.9.9",
-    "publint": "^0.3.24",
-    "tsdown": "^0.23.0",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
+    "tsdown": "^0.23.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.2"
+    "vitest": "^5.0.5"
   },
   "scripts": {
     "build": "tsdown",

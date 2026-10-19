@@ -1,7 +1,11 @@
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
-import { getFrameworkConfigValue, staticStringArray } from "../utils/framework-config.js";
+import {
+  getFrameworkConfigValue,
+  getObjectConfigValue,
+  staticStringArray,
+} from "../utils/framework-config.js";
 import { getSettings, isFrameworkConfigFile } from "../utils/settings.js";
 
 type Options = [
@@ -56,7 +60,13 @@ export default createRule<Options, "invalidPrerenderPath">({
         if (!isFrameworkConfigFile(context)) return;
         const value = getFrameworkConfigValue(program, "prerender");
         if (!value) return;
-        const paths = staticStringArray(value.value);
+        const paths =
+          staticStringArray(value.value) ??
+          (value.value.type === "ObjectExpression"
+            ? staticStringArray(
+                getObjectConfigValue(program, value.value, "paths")?.value,
+              )
+            : undefined);
         if (!paths) return;
         const options = context.options[0] ?? {};
         const routePaths = options.routePaths ?? getSettings(context).routePaths;

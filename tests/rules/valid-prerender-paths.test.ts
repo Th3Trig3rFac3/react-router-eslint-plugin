@@ -7,6 +7,15 @@ ruleTester.run("valid-prerender-paths", rule, {
       filename: "react-router.config.ts",
       code: `export default { prerender: ["/docs", "/teams/acme"] };`,
     },
+    {
+      filename: "react-router.config.ts",
+      code: `const paths = ["/docs"]; export default { prerender: { paths } };`,
+    },
+    {
+      filename: "react-router.config.ts",
+      code: `export default { prerender: { paths: ["/docs"] } };`,
+      options: [{ routePaths: ["/docs"] }],
+    },
   ],
   invalid: [
     {
@@ -16,7 +25,7 @@ ruleTester.run("valid-prerender-paths", rule, {
     },
     {
       filename: "react-router.config.ts",
-      code: `export const prerender = ["/missing"];`,
+      code: `export default { prerender: { paths: ["/missing"] } };`,
       options: [{ routePaths: ["/docs"] }],
       errors: [{ messageId: "invalidPrerenderPath" }],
     },
