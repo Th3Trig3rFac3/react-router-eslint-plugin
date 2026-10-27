@@ -1,5 +1,11 @@
 # MVP semantics validation
 
+> Historical validation from 2026-09-22. This report was reviewed on 2026-10-26
+> without rerunning the external applications. Its versions, commits, timings,
+> and diagnostics remain the evidence for that original run. See the
+> [compatibility baseline](../compatibility.md) for current upstream versions
+> and the separate local test run.
+
 **Verified:** 2026-09-22  
 **Plugin revision:** `30ed3569f57b7296a3e5874f5b90a171caf0a22a` plus the
 working-tree classifier and export fixes recorded in this report  
@@ -167,7 +173,7 @@ template. The classifier fix removed the earlier false positives for Epic's
 
 ## Rule-by-rule conclusion and controlled mutations
 
-The four accepted decisions and examples are recorded in [RFC 001](../rfcs/001-no-action-only-routes.md), [RFC 002](../rfcs/002-require-root-error-boundary.md), [RFC 003](../rfcs/003-valid-route-module-path.md), and [RFC 004](../rfcs/004-no-invalid-route-exports.md). Their rule pages link the same official sources and describe the options.
+The four accepted decisions and examples are recorded in [RFC 001](../rfcs/001-no-action-only-routes.md), [RFC 002](../rfcs/002-require-root-error-boundary.md), [RFC 003](../rfcs/003-valid-route-module-path.md), and [RFC 004](../rfcs/004-no-invalid-route-exports.md). Their rule pages link the relevant official sources and describe the current options.
 
 The unit suite supplies controlled invalid mutations instead of relying on a
 zero-diagnostic application run:

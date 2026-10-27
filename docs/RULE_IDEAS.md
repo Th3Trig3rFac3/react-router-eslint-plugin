@@ -5,9 +5,14 @@ explicitly retained in the defer/avoid section. Each rule still needs real
 application validation before it should be promoted to a low-noise shared
 configuration.
 
-> **Status — 2026-09-22:** `[x]` marks an implemented rule or completed
+> **Reviewed — 2026-10-26:** `[x]` marks an implemented rule or completed
 > implementation task. Items under “Ideas to avoid or defer” are intentionally
 > not implementation work.
+
+The descriptions below reflect current implementation scope. The individual
+[rule pages](./rules/) and [preset/settings reference](./README.md) describe
+activation requirements and heuristic limits. Implemented does not mean full
+framework parity or that a policy has passed representative-app validation.
 
 ## Prioritization criteria
 
@@ -21,9 +26,10 @@ A rule is a strong candidate when it:
 - can explain the failure and a safe remedy in one diagnostic.
 
 Rules that need a project-wide route graph should share one cached analyzer. The
-analyzer should be built from `routes.ts`, static local fragments, route module
-exports, and `react-router.config.ts` without importing or executing application
-code.
+current analyzer follows `routes.ts` and static relative fragments without
+executing application code. Some rules inspect referenced modules. URL-policy
+and framework-config rules still use explicit settings; they do not derive a
+complete application model from all of these sources.
 
 ## Implemented rules
 
@@ -71,9 +77,10 @@ route path. Examples include destructuring `params.teamId` when the route uses
 `:teamID`, or referencing a parameter that only exists on an unrelated branch.
 
 Begin with direct property access and destructuring in exported loaders and
-actions. Parent parameters must be inherited through the route graph. Skip
-computed property names and modules referenced by multiple incompatible route
-entries.
+actions, including their client variants. The current implementation uses
+`routePath`, `parentPaths`, or shared `routePaths`, combining all supplied
+parameter names. It does not infer parent paths or incompatible module reuse
+from the graph. Use file-scoped settings to avoid unrelated route parameters.
 
 Suggested config: `strict` initially; promote high-confidence cases after
 testing against real applications.
@@ -84,9 +91,11 @@ Report a parent route with configured children when its route component has no
 visible `<Outlet />` and does not call `useOutlet()`.
 
 This catches children that match but never render. Component composition makes
-the analysis uncertain: an outlet may be rendered by a child component or an
-imported layout. Support allowlisted wrapper components and skip components the
-rule cannot inspect confidently.
+the analysis uncertain: an outlet may be rendered by an imported layout.
+`wrapperComponents` supplies known wrappers. The module path inspects the
+default component; the route-config path searches parent source text and can
+report on composition it cannot inspect. `allowFiles` applies only to the
+module path; use a targeted disable for an intentional config-level exception.
 
 Suggested config: `strict`, warning only.
 
@@ -98,12 +107,13 @@ statically, require an HTML anchor or `<Link reloadDocument>`.
 
 Initial scope:
 
-- literal `to` and `href` values;
-- resource routes known from the static route graph;
+- literal `to` values and literal `navigate()` arguments;
+- resource routes supplied through `resourceRoutes` or shared settings;
 - `<Link>`, `<NavLink>`, and imperative `navigate()` calls;
 - explicit exceptions for resource routes intentionally consumed as data.
 
-Suggested config: `strict` until cross-file path resolution is proven reliable.
+Current config: `strict` warning, inactive without resource patterns. The rule
+does not infer resource targets from the route graph or inspect anchor `href`.
 
 ### `no-action-form-default-method` — implemented
 
@@ -112,8 +122,10 @@ the browser-style default `GET` behavior. Only report when the target and action
 route are statically known; search forms and forms intentionally submitting a
 GET must remain valid.
 
-An option such as `allowGetActions` or a targeted disable comment should cover
-intentional cases.
+`allowGetActions` and targeted disable comments cover intentional cases.
+`actionPaths` supplies other known targets; there is no graph inference. A
+computed action in a module exporting `action` can still report as the
+current-route case.
 
 Suggested config: `strict` warning.
 
@@ -125,8 +137,8 @@ middleware invocation; a second call throws at runtime. Recognize route module
 `middleware` and `clientMiddleware` arrays, including locally declared functions.
 Skip callbacks, aliases, loops, and branches where execution count is uncertain.
 
-Suggested config: `recommended` for unconditional duplicate calls; use a
-separate `strict` option for path-sensitive cases.
+Current config: `strict` error. There is no path-sensitive option. The schema's
+`allow` option is currently unused; use a targeted disable for exceptions.
 
 ### `return-server-middleware-response` — implemented
 
@@ -136,7 +148,9 @@ headers, or body changes from downstream handlers. Do not report middleware
 that intentionally omits `next()` and relies on React Router's automatic call,
 or `clientMiddleware`, whose return contract differs. Start with direct
 `await next();` followed by an empty return or function end; defer complex
-control flow.
+control flow. The implementation accepts any non-`undefined` top-level return
+as sufficient and does not verify its type. The schema's `allow` option is
+currently unused.
 
 Suggested config: `strict` until confirmed against representative applications.
 
@@ -149,50 +163,56 @@ These rules can be valuable in larger applications but should not enter
 
 Report files matching configured route-module globs that are not referenced by
 the static route graph. This can find abandoned pages after route refactors.
-Allow test fixtures, colocated helpers, convention-based route packages, and
-dynamic file-route adapters.
+Use `allowFiles` or `ignore` for fixtures, colocated helpers, and convention-based
+modules. A dynamic or incomplete graph skips the check; matched test files are
+not automatically exempt.
 
 ### `valid-prerender-paths` — implemented
 
-Compare static `prerender` paths from `react-router.config.ts` with the route
-graph. Report paths that cannot match any route and concrete paths that still
-contain unresolved `:params`. Skip function-valued prerender configuration.
+Check static array and object-form `prerender` paths in the default framework
+config. Reject unresolved parameters/splats; check concrete route membership
+only when `routePaths` is supplied in options or settings. Skip function-valued
+prerender configuration. The route graph is not inferred automatically.
 
 ### `no-route-manifest-collision` — implemented
 
 When lazy route discovery uses a custom `manifestPath`, report a statically
-configured application route or resource route at the same path.
+configured application route or resource route at the same exact path. Lists
+come from options or shared settings, rather than automatic graph inference.
 
 ### `no-broad-action-origin` — implemented
 
-Flag dangerously broad `allowedActionOrigins` entries such as a universal
-wildcard. This is a security policy rule and must precisely model React Router's
-documented host-pattern semantics before implementation.
+Flag any literal `allowedActionOrigins` entry containing `*` in the
+default-exported framework config, including simple local aliases. This is a
+project policy requiring wildcard review, not a complete origin-security model.
 
 ### `require-resource-content-type` — implemented
 
 For explicitly scoped resource routes that construct a `Response` containing a
-non-empty body, require a `Content-Type` header unless the body type supplies it
-automatically. This is useful for APIs, feeds, files, and documents but too
-application-specific for a shared default.
+statically known non-empty body, require a visible `Content-Type` header.
+Dynamic bodies and `Response.json()` are skipped; unknown header objects can
+report. `files` must be supplied even though the rule is present in `strict`.
 
 ### `no-sensitive-error-output` — implemented
 
-Warn when a root `ErrorBoundary` renders `error.stack` or raw unknown error
-content without a development-only guard. Avoid reporting deliberate internal
-applications and safely normalized public messages.
+Warn on obvious stack reads and raw error interpolation in a root
+`ErrorBoundary` (or additional `files`). The current syntax check does not
+recognize development-only guards. Use `allowFiles` or a targeted disable for a
+reviewed exception; this is not a general data-disclosure analysis.
 
 ### `consistent-route-module-extension` — implemented
 
 Enforce a configured extension policy for module paths in `routes.ts`, such as
 always including `.tsx` or always omitting resolvable extensions. This is purely
-stylistic and can offer a safe fix when resolution is unambiguous.
+stylistic. `mode` is required to activate the check; it inspects the current
+config file only and provides no autofix or editor suggestion.
 
 ### `no-deprecated-react-router-api` — implemented
 
-Provide version-aware migration diagnostics for APIs formally deprecated by
-React Router. The rule must be generated from a maintained compatibility table;
-it should never guess based on package names or flag APIs that remain supported.
+Provide diagnostics from a small maintained table (`json` imports by default),
+with optional project entries. The rule does not read the installed framework
+version or cover every deprecation in newer releases; additions require a
+version review.
 
 ## Advanced client/server analysis — implemented conservatively
 
@@ -203,24 +223,24 @@ component, `clientLoader`, `clientAction`, `clientMiddleware`, and
 `HydrateFallback`. Report imports that are explicitly server-only or use Node
 built-ins in browser code.
 
-This requires scope-aware dependency tracing and must understand that server
-exports are removed from browser bundles. Before implementation, confirm that
-React Router's build already does not provide a clearer diagnostic.
+The implementation follows same-file helper bindings by identifier name and
+checks unbound side-effect imports when client exports exist. It does not fully
+resolve lexical shadowing or imported implementations. Framework build checks
+remain authoritative.
 
 ### `no-browser-only-imports-in-server-exports` — implemented
 
 Perform the inverse check for `loader`, `action`, server `middleware`, and
-`headers`. Only flag modules that are explicitly marked client-only or use
-browser globals at module evaluation time; functions may intentionally inspect
-web-standard request and response APIs.
+`headers`. It uses explicit module markers, `/client` naming, and configured
+package lists. It does not analyze arbitrary browser-global usage in imported
+code. Same-file helper chains and side-effect imports are checked.
 
 ### `splittable-route-module` — implemented
 
-Identify top-level state or shared bindings that prevent client route exports
-from being split into independent chunks. This should mirror React Router's
-`splitRouteModules: "enforce"` behavior rather than inventing a second,
-conflicting definition. Implement only if lint-time feedback is materially
-earlier or clearer than the build diagnostic.
+Identify names from plain top-level `let`/`var` declarations read directly by
+client exports. This is a narrow heuristic, not equivalent to React Router's
+`splitRouteModules: "enforce"` build check. Immutable helpers, exported state,
+and helper-chain dependencies are outside its current analysis.
 
 ## Ideas to avoid or defer
 
@@ -244,8 +264,8 @@ earlier or clearer than the build diagnostic.
 - [x] Implement `no-multiple-middleware-next` using local route-module syntax.
 - [x] Build and use a cached, parser-backed project graph for imported route fragments and
       referenced route modules. Keep resolution independent of ESLint file order.
-- [x] Implement `valid-route-params`, `no-resource-route-client-navigation`, and
-      `require-outlet-for-child-routes` with explicit uncertainty handling.
+- [x] Implement parameter, resource-navigation, and outlet checks with their
+      documented explicit settings and syntax/text limits.
 - [x] Implement project-policy and conservative client/server dependency rules with
       explicit uncertainty handling.
 

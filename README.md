@@ -55,8 +55,9 @@ resource routes consumed through fetchers or forms, where returning `data()` can
 be correct. The plugin should not report those routes as invalid by default.
 
 The original `valid-resource-route` spelling is exported as a compatibility
-alias for `resource-route-returns-response`; it is not enabled by either shared
-config.
+alias for `resource-route-returns-response`; both names are enabled by `all`.
+Neither name is enabled by `recommended` or `strict`. Do not enable both names
+in the same policy, because they produce duplicate diagnostics.
 
 ## Installation
 
@@ -78,12 +79,15 @@ for local validation.
 
 - `recommended` focuses on common correctness problems with low false-positive
   rates.
-- `strict` extends the recommended checks with more opinionated rules. The
-  response-contract rule still needs an explicit file scope.
+- `strict` extends the recommended checks with more opinionated rules. Some
+  policies require options before they produce diagnostics; see the
+  [configuration and settings reference](./docs/README.md).
 - `all` exposes every rule at warning severity for rule exploration. It is
   intentionally unstable and should not be used in CI without review.
+- `rsc` enables only the client/server export-conflict check with `rsc: true`.
+  Combine it with `recommended` or `strict` when using RSC.
 
-The intended flat-config API is:
+The flat-config API is:
 
 ```js
 import reactRouter from "eslint-plugin-react-router";
@@ -91,9 +95,9 @@ import reactRouter from "eslint-plugin-react-router";
 export default [reactRouter.configs.recommended];
 ```
 
-The package also exposes `configs["flat/recommended"]` and
-`configs["flat/strict"]` and `configs["flat/all"]` aliases for configuration
-styles that prefer explicit flat-config naming.
+The package also exposes `configs["flat/recommended"]`,
+`configs["flat/strict"]`, `configs["flat/all"]`, and `configs["flat/rsc"]`
+aliases for configuration styles that prefer explicit flat-config naming.
 
 ## TypeScript and TSX setup
 
@@ -106,12 +110,12 @@ import reactRouter from "eslint-plugin-react-router";
 
 export default [
   {
+    ...reactRouter.configs.recommended,
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       parser: tsParser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    ...reactRouter.configs.recommended,
   },
 ];
 ```
@@ -154,7 +158,7 @@ export default [
 
 | Component    | Current support policy                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Node.js      | `^22.23.2 \|\| ^24.21.0`                                                                                                              |
+| Node.js      | `^22.23.4 \|\| ^24.22.1`                                                                                                              |
 | ESLint       | `^10.4.0`                                                                                                                             |
 | React Router | Framework-mode route modules and `@react-router/dev/routes` syntax; the plugin does not add React Router as a runtime peer dependency |
 
@@ -206,8 +210,9 @@ export function loader() {
 }
 ```
 
-Each rule page in [`docs/rules`](./docs/rules) includes correct alternatives,
-options, limitations, and the relevant React Router documentation link.
+The [documentation index](./docs/README.md) covers presets, settings, and
+analysis limits. Each rule page in [`docs/rules`](./docs/rules) describes its
+contract, configuration, and relevant React Router reference.
 
 ## Static-analysis boundaries and opt-outs
 

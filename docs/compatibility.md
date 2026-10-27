@@ -1,61 +1,77 @@
 # Compatibility baseline
 
-**Verified:** 2026-10-06 (ESLint support row refreshed; application evidence remains dated in its report)
-**Plugin revision:** working tree based on `git rev-parse HEAD` at validation time  
+**Documentation and upstream lookup:** 2026-10-26
+
+**Local checks:** Windows, Node.js 24.22.1, ESLint 10.13.0, TypeScript ESLint parser 8.72.0
+
+**Application evidence:** 2026-09-22; see the [pinned report](./validation/mvp-semantics.md)
+
 **Support mode:** React Router framework-mode static analysis; React Router is not a runtime peer dependency
 
-This is the release baseline for the Phase 0 decision. “Latest” means the
-upstream stable release visible on the verification date. “Previous” means the
-previous maintained line that this prerelease intends to support. An app's
-dependency declaration and the exact version used for a validation run are
-recorded separately because a floating range is not a reproducible fixture.
+Upstream release availability, package support declarations, CI configuration,
+and completed validation are separate evidence. An upstream lookup does not
+establish that this plugin was tested against that release.
 
 ## Version table
 
-| Product      | Latest upstream stable           | Previous supported line and exact fixture pin                                                                                                                             | Project declaration                                                                                | Evidence and result                                                                                                                                                                                                                                                              |
-| ------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| React Router | **8.4.0**, released 2026-09-15   | **7.18.x**; 7.18.2 in the Shopify fixture and 7.16.0 in the Epic Stack lockfile. The official docs version selector exposed 7.18.4 as the current v7 documentation build. | Static rules target the framework route-module API in both lines. No React Router peer dependency. | [Official changelog](https://reactrouter.com/changelog), [framework version selector](https://reactrouter.com/start/framework/route-module), and the three pinned application reports in [`validation/mvp-semantics.md`](validation/mvp-semantics.md).                           |
-| ESLint       | **10.12.0**, released 2026-10-02 | **10.4.0**, the plugin's minimum peer-supported version. ESLint 9.x is outside the plugin's support range.                                                                | `peerDependencies.eslint: ^10.4.0`                                                                 | [ESLint 10.12.0 release note](https://eslint.org/blog/2026/10/eslint-v10.12.0-released/) and [10.4.0 release note](https://eslint.org/blog/2026/05/eslint-v10.4.0-released/). Local package/integration checks use 10.12.0; the Node tags and ESLint versions are checked in CI. |
-| Node.js      | **24.21.0** (LTS, 2026-09-07)    | **22.23.2** (LTS, 2026-07-28)                                                                                                                                             | `engines.node: ^22.23.2 \|\| ^24.21.0`; development tooling prioritizes Node 24.                   | [Node release index](https://nodejs.org/dist/index.json) and [Node release policy](https://nodejs.org/en/about/previous-releases). CI uses the `22.x` and `24.x` tags across Linux, Windows, and macOS, including the ESLint compatibility matrix.                               |
+| Product      | Upstream snapshot on 2026-10-26                                                                                                            | Project declaration                                                                              | Validation evidence                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| React Router | **8.5.0**, released 2026-10-16; the previous-major docs selector shows **7.18.4**.                                                         | Framework route-module and route-helper analysis; no React Router peer dependency.               | The application report used **8.4.0**, **7.18.2**, and **7.16.0**. Applications have not been rerun for 8.5.0 or 7.18.4 in this review.                   |
+| ESLint       | **10.13.0**, released 2026-10-16.                                                                                                          | `peerDependencies.eslint: ^10.4.0`                                                               | The local 172-test run uses 10.13.0. CI is configured for **10.4.0** and **10.13.0** on Node 22 and 24. A configured job is not evidence of a new CI run. |
+| Node.js      | **26.12.1** is Current; **24.22.1** and **22.23.4** are the latest patches in the project's supported LTS lines, both released 2026-10-20. | `engines.node: ^22.23.4 \|\| ^24.22.1`; development uses `devEngines.runtime.version: ^24.22.1`. | Local checks use **24.22.1**. CI is configured for the moving `22.x` and `24.x` tags on Linux, Windows, and macOS. Node 26 is outside the declared range. |
 
-React Router 6.x and older, ESLint 9.x and older, and Node.js 20.x and older
-are outside this package's supported matrix. React Router 7.x remains a
-supported previous major even where a fixture uses an earlier 7.x patch; update
-the fixture pins before claiming a newer patch is tested.
+Primary sources: [React Router changelog](https://reactrouter.com/changelog),
+[framework version selector](https://reactrouter.com/start/framework/route-module),
+[ESLint 10.13.0 release note](https://eslint.org/blog/2026/10/eslint-v10.13.0-released/),
+[Node release index](https://nodejs.org/dist/index.json), and
+[Node release policy](https://nodejs.org/en/about/previous-releases).
+
+React Router 6.x and older, ESLint 9.x and older, and Node.js versions outside
+the declared 22/24 ranges are outside this package's support policy. The
+previous React Router major remains a compatibility target, but the exact
+fixture pins must be updated and rerun before a newer patch is called tested.
+The [deprecation rule](./rules/no-deprecated-react-router-api.md) uses a small
+maintained table and does not automatically cover every upstream deprecation.
 
 ## Reproducible checks
 
-The package and plugin checks use the versions resolved by the lockfile. CI
-uses the `22.x` and `24.x` Node tags when checking the minimum and current ESLint
-versions:
+Install pnpm and use the engine versions declared in `package.json`.
+`devEngines` selects the development runtime and package manager; it is
+separate from the published plugin's supported Node range. The lockfile
+records dependency resolutions.
 
-```text
-corepack pnpm install --frozen-lockfile
-corepack pnpm run ci
+```sh
+pnpm install --frozen-lockfile
+pnpm run ci
+pnpm run test:coverage
+pnpm run package:check
 ```
 
-The regular CI matrix covers Node `22.x` and `24.x` across Linux, Windows, and
-macOS. The `eslint-boundary` job runs the complete check suite for both Node tags
-with ESLint `10.4.0` and `10.12.0`. The framework application run uses:
+The regular [CI matrix](../.github/workflows/ci.yml) is configured for Node
+`22.x` and `24.x` across Linux, Windows, and macOS. The `eslint-boundary` job
+runs `ci` on Ubuntu with both Node tags and ESLint `10.4.0` and `10.13.0`.
+Coverage runs on Ubuntu/Node 24; package validation runs on both Ubuntu Node
+entries. Moving Node tags test the patches selected at job time, rather than
+pinning every minimum engine patch.
 
-```text
+The framework application runner uses the built package:
+
+```sh
 pnpm run build
-node_modules/.bin/tsx scripts/validate-mvp-apps.ts \
-  --app official-default-template=/path/to/react-router-templates/default \
-  --app epic-stack=/path/to/epic-stack \
-  --app shopify-template=/path/to/shopify-app-template-react-router
+pnpm exec tsx scripts/validate-mvp-apps.ts --app official-default-template=/path/to/react-router-templates/default --app epic-stack=/path/to/epic-stack --app shopify-template=/path/to/shopify-app-template-react-router
 ```
 
-The runner lints the full `app/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}` scope
-twice: the three recommended MVP rules, then `no-invalid-route-exports` alone.
-It emits JSON with file counts, fatal errors, diagnostics, and the effective
-settings. Intentional resource endpoints and integration exports are rerun with
-the documented `allowFiles`/`allow` options shown in the validation report.
+It lints the full `app/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}` scope twice: the
+three original recommended MVP checks, then `no-invalid-route-exports` alone.
+This is not a validation run of every rule in today's `recommended` or
+`strict` preset. Its JSON includes file counts, fatal errors, diagnostics, and
+effective settings. The pinned application report documents the intentional
+resource-route and integration-export exceptions needed for its final run.
 
 ## Maintenance rule
 
-Refresh this table when React Router publishes a major or supported-line patch,
-when ESLint changes its support policy, when Node changes LTS lines, or before a
-plugin release. A release cannot widen the package metadata or README table from
-an upstream version lookup alone: the exact boundary must pass the package,
-integration, and representative-application checks and be linked here.
+Refresh upstream evidence when React Router publishes a major or supported-line
+patch, ESLint changes its support policy, Node changes LTS lines, or before a
+plugin release. Preserve the date and pins of historical application reports;
+record a new run separately. Widen support only after package, integration,
+and representative-application checks pass at the intended boundaries.

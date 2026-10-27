@@ -20,5 +20,15 @@ export default {
 
 Function-valued prerender configuration, dynamic arrays, spreads, and computed
 properties are skipped. Pass `routePaths` for a project graph that is not
-available in the same lint file, and use `allow` for intentional generated
-paths. The rule only checks paths when they are statically known.
+inferred automatically, or use `settings.reactRouter.routePaths`. Use `allow`
+for exact path exceptions. Without route patterns, unresolved `:params` and
+splats are still reported; concrete route membership is not checked. Only the
+default-exported framework config (including simple local aliases) is checked.
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/api/framework-conventions/react-router.config.ts).

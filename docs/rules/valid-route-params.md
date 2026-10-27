@@ -11,6 +11,20 @@ path. This catches spelling differences such as `:teamId` versus
 ]
 ```
 
-Parent paths can be supplied with `parentPaths`, or globally through
-`settings.reactRouter.routePaths`. Computed property names, dynamic route
-builders, and modules referenced by incompatible route entries are skipped.
+`routePath` accepts a string or an array; it falls back to
+`settings.reactRouter.routePaths`. `parentPaths` adds parameter names from
+explicit parent patterns. Names from all supplied paths are combined, so use a
+file-scoped override to avoid admitting parameters from unrelated routes.
+
+The rule checks `loader`, `action`, `clientLoader`, and `clientAction`, including
+direct property reads and parameter destructuring. It does not infer a module's
+path or parent parameters from the project graph. Computed member reads and
+nested functions are skipped. With no configured paths, the rule is inactive.
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/start/framework/route-module).

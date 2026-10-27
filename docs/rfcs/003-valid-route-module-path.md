@@ -5,8 +5,8 @@
 **Scope:** Statically analyzable framework route configuration  
 **Configuration:** `recommended` as `error`
 
-The compatibility target is the React Router 8.4.x framework API and the
-maintained 7.18.x framework line recorded in
+The original compatibility baseline was the React Router 8.4.x framework API
+and previous-major fixtures. Current upstream and validation evidence is recorded in
 [`docs/compatibility.md`](../compatibility.md).
 
 ## Problem
@@ -34,8 +34,8 @@ never evaluates user configuration.
 - Keep paths inside the configured project boundary.
 - Skip computed strings, custom wrappers, `flatRoutes()`, and other unknown
   graph edges rather than guessing.
-- Report the literal path and candidate files; suggest a replacement only when
-  there is exactly one high-confidence candidate.
+- Report the literal path and candidate files. The current implementation
+  provides no autofix or editor suggestion.
 
 Incorrect:
 
@@ -69,8 +69,7 @@ export default [route("settings", modulePath)];
 ## Diagnostic and tests
 
 The diagnostic is attached to the literal module argument and lists the
-attempted candidates. There is no autofix; a replacement is suggested only
-when exactly one high-confidence candidate exists. The rule page is
+attempted candidates. There is no autofix or replacement suggestion. The rule page is
 [`docs/rules/valid-route-module-path.md`](../rules/valid-route-module-path.md),
 and the focused cases are in
 [`tests/rules/valid-route-module-path.test.ts`](../../tests/rules/valid-route-module-path.test.ts).

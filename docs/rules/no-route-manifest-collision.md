@@ -16,3 +16,11 @@ graphs cannot be inferred from one config file. It also checks paths supplied
 through `resourcePaths` or `settings.reactRouter.resourceRoutePaths`. Initial
 discovery mode, dynamic values, and ambiguous objects are skipped. Use `allow`
 for a reviewed exception.
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/api/framework-conventions/react-router.config.ts).

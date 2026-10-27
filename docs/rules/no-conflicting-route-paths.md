@@ -17,6 +17,16 @@ export default [
 
 The rule focuses on exact static duplicates. It does not rank patterns such as
 `:id` and `new`, because React Router can resolve those patterns deliberately.
-Pathless layout entries are not reported as conflicts. Imported route-config
-fragments are not merged into a project-wide graph yet, so duplicate detection
-is limited to the file being linted.
+Pathless layout entries are not reported as conflicts. The shared project graph
+includes statically analyzable relative route-config fragments inside the
+project boundary. Reports from a fragment are attached to its owning import in
+the linted route config. Dynamic or unresolved entries remain unknown. Paths
+with different `caseSensitive` values are compared in separate groups.
+
+## Configuration and references
+
+Presets: `recommended` (`error`), `strict` (`error`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/api/framework-conventions/routes.ts).

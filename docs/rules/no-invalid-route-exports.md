@@ -16,3 +16,11 @@ React Router APIs. Use the `allow` option for a known integration extension.
 
 The rule skips `export *` modules because their complete export set cannot be
 known without executing or deeply analyzing another module.
+
+## Configuration and references
+
+Presets: `strict` (`error`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/start/framework/route-module).

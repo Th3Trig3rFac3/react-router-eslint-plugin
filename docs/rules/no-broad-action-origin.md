@@ -16,3 +16,11 @@ patterns containing `*`. It follows simple top-level `const` aliases, including
 the config object and the origins array. Standalone named exports, dynamic
 expressions, spreads, and computed properties are not treated as configuration.
 Use `allow` for a deliberate exception and document why it is safe.
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/api/framework-conventions/react-router.config.ts).

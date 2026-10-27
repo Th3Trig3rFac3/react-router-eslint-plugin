@@ -1,7 +1,8 @@
 # no-action-only-routes
 
-Warn when a route module exports `action` or `clientAction` without a loader or
-default route component.
+Report when a route module exports `action` or `clientAction` without `loader`,
+`clientLoader`, or a default route component. This is a warning in `recommended`
+and an error in `strict`.
 
 ## Why
 
@@ -34,6 +35,8 @@ export async function action() {
 Correct:
 
 ```tsx
+import { redirect } from "react-router";
+
 export async function loader() {
   return redirect("/dashboard");
 }
@@ -45,3 +48,11 @@ export async function action() {
 
 This rule does not autofix because the correct redirect target or component is
 application-specific.
+
+## Configuration and references
+
+Presets: `recommended` (`warn`), `strict` (`error`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/start/framework/route-module).

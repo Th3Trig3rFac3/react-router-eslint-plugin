@@ -40,3 +40,11 @@ The rule is enabled as a warning in `strict`. Dynamic assignments are skipped.
 Intentional SSR or cache-priming exceptions can use `allowFiles` (with `allow`
 accepted as an alias). The diagnostic suggests adding a fallback or documenting
 the intentional exception.
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/start/framework/route-module).

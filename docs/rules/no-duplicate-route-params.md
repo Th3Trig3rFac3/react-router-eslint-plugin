@@ -16,6 +16,15 @@ route("teams/:teamId/members/:memberId", "./member.tsx");
 ```
 
 The rule recognizes dynamic parameters and splats. Dynamic or unresolved route
-patterns are skipped. Imported route-config fragments are not merged into a
-project-wide graph yet, so the rule checks the statically analyzable route tree
-in the file being linted.
+patterns are skipped. The shared project graph includes statically analyzable
+relative fragments within the project boundary, carrying known parent paths
+into child entries. Diagnostics from imported fragments are attached to their
+owning import in the linted route config.
+
+## Configuration and references
+
+Presets: `recommended` (`error`), `strict` (`error`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/api/framework-conventions/routes.ts).

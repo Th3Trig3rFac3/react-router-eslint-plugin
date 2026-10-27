@@ -1,19 +1,19 @@
 # Test coverage review
 
-Reviewed on 2026-10-06 against the current working tree. This document records
+Reviewed on 2026-10-26 against the current working tree. This document records
 the current measured baseline and the remaining improvements that are useful
 for this static-analysis plugin.
 
 ## Current result and measurement
 
 `pnpm test` passes with **34 test files and 172 tests**. The test run used
-Windows and Node.js 24.21.0, the lower patch of the supported Node.js 24 line.
+Windows, Node.js 24.22.1, ESLint 10.13.0, and TypeScript ESLint parser 8.72.0.
 It does not replace the cross-platform or minimum ESLint boundary matrix.
 
 `pnpm test:coverage` runs the same 172 tests with the V8 provider and includes
 all runtime TypeScript sources under `src/**/*.ts`. `src/types.ts` is excluded
 because it contains type declarations and no runtime behavior. The current
-baseline is:
+baseline was reproduced on 2026-10-26 and is unchanged from the prior review:
 
 | Metric     |                 Result |
 | ---------- | ---------------------: |
@@ -48,7 +48,7 @@ with JSX enabled. Rule suites cover both accepted code and reported diagnostics.
 | Public plugin and documentation contract   | Integration tests assert the complete registry, alias identity, presets, TSX parser setup, and README/docs-index behavior, including temporary checks for missing pages, stale rules, wrong labels, and support-range drift.                                                                                                              | Package export and tarball validation still runs separately because it checks built artifacts and published metadata.                                                                                                                  |
 | Shared utilities                           | Utility behavior is exercised through rules and integration tests. Coverage reports make remaining paths visible, including lower branch coverage in `ast.ts`, `exports.ts`, and parts of route analysis.                                                                                                                                 | Dedicated utility tests are only useful for a contract that cannot be expressed clearly through a rule.                                                                                                                                |
 
-The graph analyzer now treats recursive imports as uncertain for orphan checks.
+The graph analyzer treats recursive imports as uncertain for orphan checks.
 This prevents a cycle from making unrelated files appear orphaned while still
 allowing the same fragment to be shared by multiple non-recursive imports.
 

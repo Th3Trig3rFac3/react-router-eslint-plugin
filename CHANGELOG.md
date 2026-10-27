@@ -13,6 +13,9 @@
 
 - Add TypeScript and TSX flat-config setup guidance and make the rule index and
   compatibility claims follow the exported plugin and package metadata.
+- Add a documentation index with preset activation requirements and complete
+  shared settings; correct imported-fragment support, rule limitations, alias
+  behavior, and current versus historical compatibility evidence.
 
 ## 0.1.1
 

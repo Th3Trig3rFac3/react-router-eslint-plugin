@@ -5,8 +5,8 @@
 **Scope:** The configured React Router framework root route  
 **Configuration:** `recommended` as `error`
 
-The compatibility target is the React Router 8.4.x framework API and the
-maintained 7.18.x framework line recorded in
+The original compatibility baseline was the React Router 8.4.x framework API
+and previous-major fixtures. Current upstream and validation evidence is recorded in
 [`docs/compatibility.md`](../compatibility.md).
 
 ## Problem
@@ -25,10 +25,10 @@ error UI itself.
 ## Contract
 
 - Inspect only the configured root candidate, `app/root.*` by default.
-- Recognize a named `ErrorBoundary` declaration, export list, and safe local
-  re-export.
-- Respect `rootRoute` and `appDirectory` settings for custom layouts and
-  monorepos.
+- Recognize a named `ErrorBoundary` declaration, export list, or named
+  re-export syntactically, without inspecting the target implementation.
+- Use `rootRoute` for custom layouts and monorepos; changing `appDirectory`
+  alone does not rewrite the root pattern.
 - Do not require a hook, prop shape, status handling, or particular markup.
 - Do not autofix an application-specific error screen.
 

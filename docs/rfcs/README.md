@@ -2,8 +2,10 @@
 
 These RFCs record the decisions behind the four MVP rules. They are short,
 versioned design records rather than copies of the rule reference pages. The
-current decision set targets React Router framework mode on the current 8.4.x
-line and the maintained 7.18.x line. Revisit the official export and route
+original decision set was validated on React Router framework mode with 8.4.0
+and previous-major application pins. Those are historical baselines, not the
+latest upstream versions. See the compatibility page for current release
+lookups and the rule pages for implementation limitations. Revisit export and route
 helper evidence before changing either line or promoting a rule into
 `recommended`.
 

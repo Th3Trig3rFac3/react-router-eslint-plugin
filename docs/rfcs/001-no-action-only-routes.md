@@ -5,8 +5,8 @@
 **Scope:** React Router framework route modules; server and client actions  
 **Configuration:** `recommended` as `warn`
 
-The compatibility target is the React Router 8.4.x framework API and the
-maintained 7.18.x framework line recorded in
+The original compatibility baseline was the React Router 8.4.x framework API
+and previous-major fixtures. Current upstream and validation evidence is recorded in
 [`docs/compatibility.md`](../compatibility.md).
 
 ## Problem
@@ -21,7 +21,7 @@ resource route used for a webhook or another POST endpoint.
 React Router documents that a resource route has a loader or action without a
 default component, and that GET uses `loader` while other methods use `action`:
 [resource routes](https://reactrouter.com/how-to/resource-routes). The rule
-therefore reports only a warning. It cannot infer whether an action-only module
+therefore reports a warning in `recommended` (raised to error in `strict`). It cannot infer whether an action-only module
 is an intentional resource endpoint, so `allowFiles` is the required escape
 hatch for known endpoints. `allow` remains an alias for compatibility.
 

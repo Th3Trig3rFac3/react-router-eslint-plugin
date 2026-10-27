@@ -5,8 +5,8 @@
 **Scope:** Recognized framework route modules  
 **Configuration:** `strict` as `error`
 
-The compatibility target is the React Router 8.4.x framework API and the
-maintained 7.18.x framework line recorded in
+The original compatibility baseline was the React Router 8.4.x framework API
+and previous-major fixtures. Current upstream and validation evidence is recorded in
 [`docs/compatibility.md`](../compatibility.md).
 
 ## Problem

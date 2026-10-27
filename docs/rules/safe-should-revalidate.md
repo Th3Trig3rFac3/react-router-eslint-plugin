@@ -24,3 +24,11 @@ export function shouldRevalidate({ defaultShouldRevalidate }) {
 The rule intentionally checks only a single literal `return false` (including
 an expression-bodied arrow). Complex control flow is skipped. Intentional
 exceptions can use `allowFiles` (with `allow` accepted as an alias).
+
+## Configuration and references
+
+Presets: `strict` (`warn`), `all` (`warn`). See the
+[preset activation and shared settings reference](../README.md) for required
+options and analysis limits. No autofix or editor suggestion is provided.
+
+Framework reference: [React Router documentation](https://reactrouter.com/start/framework/route-module).

@@ -1,9 +1,18 @@
 # React Router ESLint Plugin — Implementation Plan
 
-> **Implementation status — 2026-10-06:** Checkboxes marked `[x]` are
-> implemented and covered by tests or package validation. Release decisions,
+> **Implementation review — 2026-10-26:** Checkboxes marked `[x]` record
+> completed implementation work; they do not establish full framework parity
+> or a fresh external application run. Release decisions,
 > external application feedback, and publishing tasks remain unchecked until
 > they are completed by the maintainer.
+
+The current package is version `0.1.1`, with 33 exported rule names backed by
+32 implementations. The [documentation index](./README.md) describes current
+presets, settings, and activation requirements; individual rule pages describe
+known heuristic limits. This plan also retains future requirements. Generated
+documentation, performance budgets, full type/control-flow analysis, fresh
+application validation, and dependency/license auditing should not be inferred
+from checked implementation milestones.
 
 ## 1. Goal
 
@@ -58,7 +67,7 @@ review does not accidentally treat the provisional name as available.
 - Start with React Router framework-mode syntax used by the latest stable release and test the previous maintained major where practical.
 - Treat `react-router` and `@react-router/dev` as fixture/dev dependencies, not runtime peer dependencies. AST-based rules should not force users to install packages they do not otherwise need.
 - Keep the ESLint peer range at `^10.4.0`; CI checks the minimum and current versions against both supported Node.js boundary versions.
-- The package supports the Node.js 22 and 24 LTS lines through `^22.23.2 || ^24.21.0`; development and release tooling prioritize Node.js 24, while CI retains Node.js 22 coverage.
+- The package supports the Node.js 22 and 24 LTS lines through `^22.23.4 || ^24.22.1`; development and release tooling prioritize Node.js 24, while CI retains Node.js 22 coverage.
 - Keep `@types/node` development-only and aligned with the primary Node.js 24 development runtime. Node.js 22 compatibility must continue to be verified by CI rather than inferred from the type package version.
 - Prefer flat config. Do not add legacy eslintrc configs to a brand-new package unless user demand justifies their ongoing test burden.
 
@@ -86,7 +95,7 @@ MIT would also be reasonable and would match React Router, Vitest's plugin, and 
 - `app/routes.ts` and statically analyzable route config fragments.
 - Static ESM exports, including declarations, export specifiers, aliases, default exports, and re-exports where safely resolvable.
 - Configurable app directory, root route path, route config paths, extensions, and intentional exceptions.
-- Flat `recommended` and `strict` configs.
+- Flat `recommended`, `strict`, `all`, and opt-in `rsc` configs, with `flat/` aliases.
 
 ### Non-goals for version 1
 
@@ -144,9 +153,9 @@ Report when the configured root route does not export a named `ErrorBoundary`.
 
 Behavior:
 
-- default root candidates: `app/root.{js,jsx,ts,tsx,mjs,mts}`;
-- allow `rootRoute` and `appDirectory` settings for custom layouts/monorepos;
-- recognize declarations, export lists, and statically resolvable re-exports;
+- default root pattern: `app/root.*`;
+- configure `rootRoute` explicitly for custom layouts/monorepos;
+- recognize declarations, export lists, and named re-exports syntactically;
 - do not require a particular implementation or hook;
 - do not autofix an error UI, because accessible and secure error presentation is application-specific.
 
@@ -166,7 +175,8 @@ Initial helper coverage:
 
 Support `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs`, `.mts`, and `.cts`, plus explicitly documented extensionless resolution. Resolve paths according to React Router's app-directory semantics, not Node package resolution. Follow static route-config fragments imported by relative path only if this can be done without executing them.
 
-Skip computed strings and custom wrappers in version 1. Report the literal path, attempted base directory, and a concise list of candidates. Correcting a typo may be offered as a suggestion only when there is exactly one high-confidence candidate.
+Skip computed strings and custom wrappers. Report the literal path and attempted
+candidates. There is currently no autofix or editor suggestion.
 
 Enable as `error` in `recommended`.
 
@@ -187,7 +197,8 @@ This is the precise replacement for the proposed blanket `valid-resource-route` 
 - externally consumed resources should return/throw a `Response`;
 - routes consumed through fetchers or form submissions may return `data()`.
 
-Because source code cannot always infer the consumer, keep this rule out of `recommended`. In `strict`, require the user to select files or a mode:
+Because source code cannot always infer the consumer, this rule is omitted from
+both `recommended` and `strict`. Enable it in an explicit file-scoped override:
 
 ```js
 "react-router/resource-route-returns-response": [
@@ -196,7 +207,13 @@ Because source code cannot always infer the consumer, keep this rule out of `rec
 ]
 ```
 
-Recognize `new Response(...)`, returned or thrown `Response` values, React Router `redirect(...)`, and configured response-producing helpers. For indirect calls or complex control flow, use TypeScript type information when available; otherwise avoid claiming certainty. Ensure every reachable, statically understood branch complies. Do not evaluate the function.
+The implementation recognizes `new Response(...)`, `redirect(...)`,
+`redirectDocument(...)`, `replace(...)`, and optionally `data(...)` by syntax.
+It does not support configured response factories or type information. Returned
+identifiers can report, while fallthrough paths are not fully checked. This is
+not a proof that every reachable branch complies. Both exported spellings are
+enabled by `all`; disable the `valid-resource-route` alias to avoid duplicate
+reports.
 
 ### High-value follow-up rules
 
@@ -223,9 +240,15 @@ Export a default plugin object with `meta`, `rules`, and `configs`, following cu
 Low-noise correctness checks:
 
 - `require-root-error-boundary`: `error`;
+- `valid-route-config`: `error`;
 - `valid-route-module-path`: `error`;
+- `no-duplicate-route-ids`: `error`;
+- `no-duplicate-route-params`: `error`;
+- `no-conflicting-route-paths`: `error`;
 - `no-action-only-routes`: `warn` for the initial release;
-- `no-invalid-route-exports`: add only after ecosystem validation.
+
+`no-invalid-route-exports` remains in `strict`; promotion to `recommended`
+requires another ecosystem review.
 
 The flat config should register the plugin itself and use documented file patterns. Provide both of these supported forms in tests and README:
 
@@ -247,15 +270,26 @@ export default defineConfig({
 
 ### `strict`
 
-Extend all recommended checks and add opinionated or context-dependent rules. Initially this may add `no-invalid-route-exports` and opt-in route conventions, but it must not silently enable `resource-route-returns-response` without a meaningful file scope. If a strict rule requires options, either provide conservative defaults or document a `strict` base plus an example override.
+Extends all recommended checks and adds the strict rules listed in the README,
+including `no-invalid-route-exports`. It raises `no-action-only-routes` to
+error and omits the resource-response rule. Rules needing explicit options are
+listed in the [preset activation reference](./README.md#presets).
 
 ### `all`
 
-Optionally expose `all` for maintainers and rule exploration. Clearly state that it is unstable as a policy bundle and is unsuitable for CI without review.
+Exports every registered name at warning severity for exploration. It is
+unstable as a policy bundle and unsuitable for CI without review. This includes
+both resource-response spellings. `no-conflicting-route-exports` is present but
+needs `rsc: true` before it checks anything.
+
+### `rsc`
+
+Enables only `no-conflicting-route-exports` with `rsc: true`, at error severity.
+It does not extend `recommended` or `strict`; combine presets as appropriate.
 
 Configuration changes that create new diagnostics require deliberate semver treatment. Adding a rule without enabling it is normally minor; enabling a new rule in `recommended` or making an existing rule stricter should be reserved for a major release, or staged first as a warning with release notes.
 
-## 7. Proposed repository structure
+## 7. Current repository structure
 
 ```text
 .
@@ -265,8 +299,10 @@ Configuration changes that create new diagnostics require deliberate semver trea
 │   └── workflows/release.yml
 ├── docs/
 │   ├── PLAN.md
+│   ├── README.md
 │   ├── RULE_IDEAS.md
 │   ├── compatibility.md
+│   ├── test-coverage.md
 │   ├── rfcs/
 │   │   ├── README.md
 │   │   └── <mvp-rule>.md
@@ -279,19 +315,21 @@ Configuration changes that create new diagnostics require deliberate semver trea
 │       ├── resource-route-returns-response.md
 │       └── valid-route-module-path.md
 ├── scripts/
-│   ├── generate-rule-docs.ts
+│   ├── rule-index.ts
+│   ├── check-package-types.ts
 │   ├── validate-mvp-apps.ts
+│   ├── verify-package.ts
 │   └── verify-rule-index.ts
 ├── src/
 │   ├── configs/
-│   │   ├── recommended.ts
-│   │   └── strict.ts
+│   │   └── index.ts
 │   ├── rules/
 │   │   └── <one-file-per-rule>.ts
 │   ├── utils/
 │   │   ├── create-rule.ts
 │   │   ├── exports.ts
-│   │   ├── project-settings.ts
+│   │   ├── settings.ts
+│   │   ├── project-route-config.ts
 │   │   ├── route-config.ts
 │   │   ├── route-module.ts
 │   │   └── path-resolution.ts
@@ -300,8 +338,7 @@ Configuration changes that create new diagnostics require deliberate semver trea
 ├── tests/
 │   ├── fixtures/
 │   ├── integration/
-│   ├── rules/
-│   └── package/
+│   └── rules/
 ├── CHANGELOG.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
@@ -313,7 +350,10 @@ Configuration changes that create new diagnostics require deliberate semver trea
 └── tsdown.config.ts
 ```
 
-Keep rule metadata in the rule source as the single source of truth. Generate the README rule table and rule-doc headers, then fail CI if generated documentation is stale.
+Rule metadata and preset membership live in source. `docs:check` verifies
+canonical page presence, README rows and preset labels, alias identity, support
+ranges, and configured CI boundaries. The table and page prose are maintained
+manually; there is no `generate-rule-docs.ts` or prose/schema drift checker yet.
 
 ## 8. Technical architecture
 
@@ -321,9 +361,10 @@ Keep rule metadata in the rule source as the single source of truth. Generate th
 
 - TypeScript with strict compiler options.
 - `@typescript-eslint/utils` for typed rule construction and AST types.
-- `@typescript-eslint/rule-tester` with the parser as test/dev dependencies.
-- Vitest for unit/integration tests, unless RuleTester compatibility proves simpler with another runner.
-- `tsdown` or an equivalent maintained bundler to emit ESM, CJS, and declaration files.
+- `@typescript-eslint/rule-tester` as a dev dependency; the parser and utils
+  are runtime dependencies because cross-file source analysis uses them.
+- Vitest for unit/integration tests and V8 coverage.
+- `tsdown` to emit ESM, CJS, and declaration files.
 - ESLint for this repository, Prettier for formatting, and `eslint-plugin-eslint-plugin` for plugin-authoring mistakes.
 - `publint` and `@arethetypeswrong/cli` for package export validation.
 
@@ -346,7 +387,11 @@ Rules should consume this normalized model rather than each implementing incompl
 
 Identify helpers by their imports from `@react-router/dev/routes`, including local aliases. Parse only statically understandable arrays, spreads, and calls. For `relative()`, carry the declared base directory into returned helper calls. Keep dynamic nodes as “unknown” and skip them with optional debug output; never evaluate them.
 
-If imported local config fragments are supported, resolve and parse only relative source files within the project root. Add cycle detection, a maximum traversal depth, and caching keyed by real path plus settings. Do not follow package imports or cross the project root by default.
+Imported local fragments are supported within the project root, with cycle/depth
+protection and parsed-file caching by path, modification time, and size. Package
+imports and unresolved fragments remain unknown. This graph is used by the
+route-config rules; parameter, resource-navigation, prerender, and manifest
+checks still need explicit URL patterns rather than inferring them from it.
 
 ### Settings
 
@@ -358,13 +403,20 @@ settings: {
     appDirectory: "app",
     rootRoute: "app/root.tsx",
     routeConfig: ["app/routes.ts"],
+    frameworkConfig: ["react-router.config.*", "react-router.config.*.*"],
     routeModuleFiles: ["app/root.tsx", "app/routes/**/*.{js,jsx,ts,tsx}"],
-    extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs", ".mts"]
+    routePaths: [],
+    resourceRoutePaths: [],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"]
   }
 }
 ```
 
-Defaults should work for a newly created React Router app. Resolve relative settings from ESLint's working directory, normalize Windows and POSIX separators, respect symlinks safely, and prevent traversal outside the project root unless explicitly configured.
+Relative settings resolve from ESLint's working directory. Changing
+`appDirectory` does not rewrite root/config/module patterns. See the
+[complete defaults](./README.md#shared-settings). Project-boundary checks apply
+to local resolution; there is no option to permit traversal outside that
+boundary.
 
 ### Performance and security
 
@@ -408,7 +460,12 @@ For every rule, include valid and invalid cases for:
 
 ### Quality gates
 
-Required CI checks: format, lint, typecheck, unit tests, integration tests, build, package validation, generated-doc consistency, and dependency/license audit. Set branch protection only after the checks are stable.
+Current CI runs format, lint, typecheck, unit/integration tests, docs-index
+validation, and build across the OS/Node matrix. Coverage runs on Ubuntu/Node
+24, and package validation runs on Ubuntu. A minimum/current ESLint job runs
+the `ci` script separately. Dependency/license auditing and generated-doc
+consistency are still release requirements to implement. Set branch protection
+only after the checks are stable.
 
 ## 10. README deliverable
 
@@ -501,6 +558,7 @@ Exit criterion: every strict diagnostic represents a documented policy, and cont
 - [x] Add the parser-backed, project-bounded route-config graph with caching and cycle/depth protection.
 - [x] Add rule documentation, README entries, focused tests, and the `all` configuration.
 - [x] Verify formatting, linting, typechecking, tests, documentation indexes, and package publishability.
+- [ ] Replace documented syntax/text heuristics where framework parity is required; expand real-application validation before promoting policies.
 
 ### Phase 5 — prerelease and stable release
 
