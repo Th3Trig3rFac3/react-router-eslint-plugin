@@ -2,7 +2,7 @@
 
 **Documentation and upstream lookup:** 2026-10-26
 
-**Local checks:** Windows, Node.js 24.22.1, ESLint 10.13.0, TypeScript ESLint parser 8.72.0
+**Local checks:** Windows, Node.js 24.22.1, ESLint 10.14.0, TypeScript ESLint parser 8.72.0
 
 **Application evidence:** 2026-09-22; see the [pinned report](./validation/mvp-semantics.md)
 
@@ -14,20 +14,20 @@ establish that this plugin was tested against that release.
 
 ## Version table
 
-| Product      | Upstream snapshot on 2026-10-26                                                                                                            | Project declaration                                                                              | Validation evidence                                                                                                                                       |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| React Router | **8.5.0**, released 2026-10-16; the previous-major docs selector shows **7.18.4**.                                                         | Framework route-module and route-helper analysis; no React Router peer dependency.               | The application report used **8.4.0**, **7.18.2**, and **7.16.0**. Applications have not been rerun for 8.5.0 or 7.18.4 in this review.                   |
-| ESLint       | **10.13.0**, released 2026-10-16.                                                                                                          | `peerDependencies.eslint: ^10.4.0`                                                               | The local 172-test run uses 10.13.0. CI is configured for **10.4.0** and **10.13.0** on Node 22 and 24. A configured job is not evidence of a new CI run. |
-| Node.js      | **26.12.1** is Current; **24.22.1** and **22.23.4** are the latest patches in the project's supported LTS lines, both released 2026-10-20. | `engines.node: ^22.23.4 \|\| ^24.22.1`; development uses `devEngines.runtime.version: ^24.22.1`. | Local checks use **24.22.1**. CI is configured for the moving `22.x` and `24.x` tags on Linux, Windows, and macOS. Node 26 is outside the declared range. |
+| Product      | Upstream snapshot on 2026-10-26                                                                                                            | Project declaration                                                                                            | Validation evidence                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| React Router | **8.5.0**, released 2026-10-16; the previous-major docs selector shows **7.18.4**.                                                         | Framework route-module and route-helper analysis; no React Router peer dependency.                             | The application report used **8.4.0**, **7.18.2**, and **7.16.0**. Applications have not been rerun for 8.5.0 or 7.18.4 in this review.                        |
+| ESLint       | **10.14.0**, released 2026-10-16.                                                                                                          | `peerDependencies.eslint: ^10.4.0`                                                                             | The local 172-test run uses 10.14.0. CI is configured for **10.4.0** and **10.14.0** on Node 22, 24, and 26. A configured job is not evidence of a new CI run. |
+| Node.js      | **26.12.1** is Current; **24.22.1** and **22.23.4** are the latest patches in the project's supported LTS lines, both released 2026-10-20. | `engines.node: ^22.23.4 \|\| ^24.22.1 \|\| ^26.13.0`; development uses `devEngines.runtime.version: ^24.22.1`. | Local checks use **24.22.1**. CI is configured for the moving `22.x`, `24.x`, and `26.x` tags on Linux, Windows, and macOS.                                    |
 
 Primary sources: [React Router changelog](https://reactrouter.com/changelog),
 [framework version selector](https://reactrouter.com/start/framework/route-module),
-[ESLint 10.13.0 release note](https://eslint.org/blog/2026/10/eslint-v10.13.0-released/),
+[ESLint 10.14.0 release note](https://eslint.org/blog/2026/10/eslint-v10.14.0-released/),
 [Node release index](https://nodejs.org/dist/index.json), and
 [Node release policy](https://nodejs.org/en/about/previous-releases).
 
 React Router 6.x and older, ESLint 9.x and older, and Node.js versions outside
-the declared 22/24 ranges are outside this package's support policy. The
+the declared 22/24/26 ranges are outside this package's support policy. The
 previous React Router major remains a compatibility target, but the exact
 fixture pins must be updated and rerun before a newer patch is called tested.
 The [deprecation rule](./rules/no-deprecated-react-router-api.md) uses a small
@@ -48,9 +48,9 @@ pnpm run package:check
 ```
 
 The regular [CI matrix](../.github/workflows/ci.yml) is configured for Node
-`22.x` and `24.x` across Linux, Windows, and macOS. The `eslint-boundary` job
-runs `ci` on Ubuntu with both Node tags and ESLint `10.4.0` and `10.13.0`.
-Coverage runs on Ubuntu/Node 24; package validation runs on both Ubuntu Node
+`22.x`, `24.x`, and `26.x` across Linux, Windows, and macOS. The `eslint-boundary` job
+runs `ci` on Ubuntu with all three Node tags and ESLint `10.4.0` and `10.14.0`.
+Coverage runs on Ubuntu/Node 26; package validation runs on all three Ubuntu Node
 entries. Moving Node tags test the patches selected at job time, rather than
 pinning every minimum engine patch.
 

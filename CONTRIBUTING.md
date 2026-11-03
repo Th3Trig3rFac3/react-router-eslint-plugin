@@ -19,9 +19,10 @@ pnpm run package:check
 ```
 
 The package metadata is the source of truth for the supported runtime: Node.js
-`^22.23.4 || ^24.22.1` and ESLint `^10.4.0`. CI uses the Node.js `22.x` and
-`24.x` tags across operating systems and checks the minimum and current ESLint
-versions. The `@types/node` dependency is development-only and follows the
+`^22.23.4 || ^24.22.1 || ^26.13.0` and ESLint `^10.4.0`. CI uses the Node.js
+`22.x`, `24.x`, and `26.x` tags across operating systems and checks ESLint
+`10.4.0` and `10.14.0`.
+The `@types/node` dependency is development-only and follows the
 primary Node.js 24 line; it does not change the Node.js versions accepted by the
 published plugin.
 

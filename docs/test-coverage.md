@@ -7,7 +7,7 @@ for this static-analysis plugin.
 ## Current result and measurement
 
 `pnpm test` passes with **34 test files and 172 tests**. The test run used
-Windows, Node.js 24.22.1, ESLint 10.13.0, and TypeScript ESLint parser 8.72.0.
+Windows, Node.js 24.22.1, ESLint 10.14.0, and TypeScript ESLint parser 8.72.0.
 It does not replace the cross-platform or minimum ESLint boundary matrix.
 
 `pnpm test:coverage` runs the same 172 tests with the V8 provider and includes

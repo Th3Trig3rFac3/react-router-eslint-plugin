@@ -158,12 +158,12 @@ export default [
 
 | Component    | Current support policy                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Node.js      | `^22.23.4 \|\| ^24.22.1`                                                                                                              |
+| Node.js      | `^22.23.4 \|\| ^24.22.1 \|\| ^26.13.0`                                                                                                |
 | ESLint       | `^10.4.0`                                                                                                                             |
 | React Router | Framework-mode route modules and `@react-router/dev/routes` syntax; the plugin does not add React Router as a runtime peer dependency |
 
-Development and release tooling prioritize Node.js 24. Node.js 22 remains a
-supported compatibility line and is covered by CI. The development
+Development and release tooling prioritize Node.js 24. Node.js 22 and 26 are
+also supported and covered by CI. The development
 `@types/node` dependency follows the primary Node.js 24 line.
 
 The compatibility matrix is deliberately conservative while the package is a

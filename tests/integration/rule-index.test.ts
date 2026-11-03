@@ -58,7 +58,7 @@ async function fixture(): Promise<string> {
   await write("package.json", JSON.stringify(packageJson));
   await write(
     ".github/workflows/ci.yml",
-    "  eslint-boundary:\n    matrix:\n      node: [22.x, 24.x]\n      eslint: [10.4.0, 10.13.0]\n",
+    "  eslint-boundary:\n    matrix:\n      node: [22.x, 24.x]\n      eslint: [10.4.0, 10.14.0]\n",
   );
   return root;
 }

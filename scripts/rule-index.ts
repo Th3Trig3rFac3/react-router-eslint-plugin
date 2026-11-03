@@ -106,8 +106,8 @@ export function verifyRuleIndex(root: string): string {
   if (!boundary?.includes("node: [22.x, 24.x]")) {
     throw new Error("CI ESLint boundary job must use the Node.js 22.x and 24.x tags");
   }
-  if (!boundary.includes("eslint: [10.4.0, 10.13.0]")) {
-    throw new Error("CI ESLint boundary job must test ESLint 10.4.0 and 10.13.0");
+  if (!boundary.includes("eslint: [10.4.0, 10.14.0]")) {
+    throw new Error("CI ESLint boundary job must test ESLint 10.4.0 and 10.14.0");
   }
 
   return `Verified ${rules.length} rule pages, README entries, presets, and support ranges.`;

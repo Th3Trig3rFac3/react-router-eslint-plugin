@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [22.x, 24.x]
+        node: [22.x, 24.x, 26.x]
 
     steps:
       - name: Check out repository
@@ -38,7 +38,7 @@ jobs:
         run: pnpm run ci
 
       - name: Record coverage baseline
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '24.x'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '26.x'
         run: pnpm run test:coverage
 
       - name: Validate package exports
@@ -51,8 +51,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        eslint: [10.4.0, 10.13.0]
-        node: [22.x, 24.x]
+        eslint: [10.4.0, 10.14.0]
+        node: [22.x, 24.x, 26.x]
 
     steps:
       - name: Check out repository

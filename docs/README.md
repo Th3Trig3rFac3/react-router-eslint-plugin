@@ -9,6 +9,7 @@ maintainer decisions.
 - [Compatibility and CI boundaries](./compatibility.md)
 - [Measured test coverage](./test-coverage.md)
 - [Implementation plan and remaining release work](./PLAN.md)
+- [Consumer application integration test improvement plan](./CONSUMER_INTEGRATION_PLAN.md)
 - [Implemented ideas and deferred proposals](./RULE_IDEAS.md)
 - [MVP design decisions](./rfcs/README.md)
 - [Historical application validation](./validation/mvp-semantics.md)
