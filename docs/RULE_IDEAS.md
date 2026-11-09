@@ -61,6 +61,8 @@ fragments inside the project root and skips dynamic or unresolved graph edges:
 - [x] `no-server-only-imports-in-client-exports`
 - [x] `no-browser-only-imports-in-server-exports`
 - [x] `splittable-route-module`
+- [x] `prefer-link-for-internal-navigation`
+- [x] `require-route-error-boundary`
 
 - [x] The plugin also exports `require-root-error-boundary`,
       `valid-route-module-path`, `no-action-only-routes`,
@@ -213,6 +215,19 @@ Provide diagnostics from a small maintained table (`json` imports by default),
 with optional project entries. The rule does not read the installed framework
 version or cover every deprecation in newer releases; additions require a
 version review.
+
+### `prefer-link-for-internal-navigation` — implemented
+
+Require a React Router `Link` instead of a plain anchor for literal root-relative
+internal URLs in recognized route modules. Preserves anchor tags for downloads,
+`target`, `reloadDocument`, external targets, and relative/computed URLs.
+
+### `require-route-error-boundary` — implemented
+
+Require an exported `ErrorBoundary` component at explicitly configured critical
+application route boundaries. Does not enforce boundaries across every route,
+honoring application architecture decisions. Activated only when `files` is
+configured.
 
 ## Advanced client/server analysis — implemented conservatively
 

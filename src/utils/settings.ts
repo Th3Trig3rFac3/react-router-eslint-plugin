@@ -59,7 +59,9 @@ export function getSettings(
 }
 
 function globToRegExp(pattern: string): RegExp {
-  const normalized = pattern.replaceAll("\\", "/").replace(/^\.\//, "");
+  let normalized = pattern.replaceAll("\\", "/").replace(/^\.\//, "");
+  normalized = normalized.replace(/(?:\*\*\/)+/g, "**/");
+  normalized = normalized.replace(/\*{3,}/g, "**");
   let expression = "^";
 
   for (let index = 0; index < normalized.length; index += 1) {
@@ -92,9 +94,14 @@ function globToRegExp(pattern: string): RegExp {
   return new RegExp(`${expression}$`);
 }
 
-function expandBracePatterns(pattern: string): string[] {
+const MAX_BRACE_EXPANSIONS = 64;
+
+function expandBracePatterns(
+  pattern: string,
+  limit = { remaining: MAX_BRACE_EXPANSIONS },
+): string[] {
   const opening = pattern.indexOf("{");
-  if (opening < 0) return [pattern];
+  if (opening < 0 || limit.remaining <= 0) return [pattern];
   const closing = pattern.indexOf("}", opening + 1);
   if (closing < 0) return [pattern];
 
@@ -104,18 +111,49 @@ function expandBracePatterns(pattern: string): string[] {
     .filter((alternative) => alternative.length > 0);
   if (alternatives.length === 0) return [pattern];
 
-  return alternatives.flatMap((alternative) =>
-    expandBracePatterns(
-      `${pattern.slice(0, opening)}${alternative}${pattern.slice(closing + 1)}`,
-    ),
-  );
+  const results: string[] = [];
+  for (const alternative of alternatives) {
+    if (limit.remaining <= 0) {
+      results.push(
+        `${pattern.slice(0, opening)}${alternative}${pattern.slice(closing + 1)}`,
+      );
+      break;
+    }
+    limit.remaining -= 1;
+    results.push(
+      ...expandBracePatterns(
+        `${pattern.slice(0, opening)}${alternative}${pattern.slice(closing + 1)}`,
+        limit,
+      ),
+    );
+  }
+  return results.length > 0 ? results : [pattern];
+}
+
+const REGEX_CACHE_LIMIT = 512;
+const patternRegexCache = new Map<string, RegExp[]>();
+
+export function clearPatternCache(): void {
+  patternRegexCache.clear();
+}
+
+function getCompiledPatternRegexes(pattern: string): RegExp[] {
+  const cached = patternRegexCache.get(pattern);
+  if (cached) return cached;
+
+  const compiled = expandBracePatterns(pattern).map((expanded) => globToRegExp(expanded));
+  if (patternRegexCache.size >= REGEX_CACHE_LIMIT) {
+    const firstKey = patternRegexCache.keys().next().value;
+    if (firstKey !== undefined) patternRegexCache.delete(firstKey);
+  }
+  patternRegexCache.set(pattern, compiled);
+  return compiled;
 }
 
 export function matchesPattern(filename: string, pattern: string): boolean {
   const normalizedFilename = filename.replaceAll("\\", "/").replace(/^\.\//, "");
-  return expandBracePatterns(pattern).some((expanded) =>
-    globToRegExp(expanded).test(normalizedFilename),
-  );
+  const regexes = getCompiledPatternRegexes(pattern);
+  return regexes.some((regex) => regex.test(normalizedFilename));
 }
 
 export function relativeFilename(

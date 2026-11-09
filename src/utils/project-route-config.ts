@@ -4,6 +4,8 @@ import { createRequire } from "node:module";
 
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
 
+import type { ModuleExports } from "../types.js";
+import { collectExports } from "./exports.js";
 import {
   analyzeRouteConfig,
   type RouteConfigAnalysis,
@@ -20,8 +22,10 @@ interface ParserModule {
 
 interface ParsedFile {
   filename: string;
+  source: string;
   program: TSESTree.Program;
   analysis: RouteConfigAnalysis;
+  exports?: ModuleExports;
 }
 
 export interface ProjectRouteConfigIssue {
@@ -57,6 +61,21 @@ const parsedCache = new Map<
   string,
   { mtimeMs: number; size: number; parsed: ParsedFile }
 >();
+
+let analysisMemo = new WeakMap<
+  TSESTree.Program,
+  Map<string, ProjectRouteConfigAnalysis>
+>();
+
+export function clearProjectRouteCache(): void {
+  parsedCache.clear();
+  analysisMemo = new WeakMap();
+}
+
+export function setParserForTesting(customParser: ParserModule | undefined): void {
+  parser = customParser;
+  clearProjectRouteCache();
+}
 
 function safeProjectPath(projectRoot: string, candidate: string): string | undefined {
   const absolute = path.resolve(candidate);
@@ -115,10 +134,8 @@ function relativeImports(program: TSESTree.Program): string[] {
 function parseFile(filename: string): ParsedFile | undefined {
   if (!parser) return undefined;
   let stat: fs.Stats;
-  let source: string;
   try {
     stat = fs.statSync(filename);
-    source = fs.readFileSync(filename, "utf8");
   } catch {
     return undefined;
   }
@@ -127,6 +144,7 @@ function parseFile(filename: string): ParsedFile | undefined {
     return cached.parsed;
   }
   try {
+    const source = fs.readFileSync(filename, "utf8");
     const program = parser.parse(source, {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -135,12 +153,46 @@ function parseFile(filename: string): ParsedFile | undefined {
       range: true,
       loc: true,
     });
-    const parsed = { filename, program, analysis: analyzeRouteConfig(program) };
+    const parsed: ParsedFile = {
+      filename,
+      source,
+      program,
+      analysis: analyzeRouteConfig(program),
+    };
     parsedCache.set(filename, { mtimeMs: stat.mtimeMs, size: stat.size, parsed });
     return parsed;
   } catch {
     return undefined;
   }
+}
+
+export function readCachedFile(filename: string): string | undefined {
+  let stat: fs.Stats;
+  try {
+    stat = fs.statSync(filename);
+  } catch {
+    return undefined;
+  }
+  const cached = parsedCache.get(filename);
+  if (cached && cached.mtimeMs === stat.mtimeMs && cached.size === stat.size) {
+    return cached.parsed.source;
+  }
+  const parsed = parseFile(filename);
+  if (parsed) return parsed.source;
+  try {
+    return fs.readFileSync(filename, "utf8");
+  } catch {
+    return undefined;
+  }
+}
+
+export function getCachedExports(filename: string): ModuleExports | undefined {
+  const parsed = parseFile(filename);
+  if (!parsed) return undefined;
+  if (!parsed.exports) {
+    parsed.exports = collectExports(parsed.program);
+  }
+  return parsed.exports;
 }
 
 export function analyzeProjectRouteConfig(
@@ -152,6 +204,21 @@ export function analyzeProjectRouteConfig(
     filename && filename !== "<input>" && filename !== "<text>"
       ? path.resolve(filename)
       : undefined;
+
+  const projectRoot = path.resolve(getCwd(context));
+  const settings = getSettings(context);
+  const memoKey = `${projectRoot}\0${currentFile ?? ""}\0${settings.extensions.join(",")}`;
+
+  let programMemo = analysisMemo.get(program);
+  if (!programMemo) {
+    programMemo = new Map();
+    analysisMemo.set(program, programMemo);
+  }
+  const memoized = programMemo.get(memoKey);
+  if (memoized) {
+    return memoized;
+  }
+
   const current = analyzeRouteConfig(program);
   const entries: ProjectRouteConfigEntry[] = current.entries.map((entry) => ({
     entry,
@@ -164,16 +231,17 @@ export function analyzeProjectRouteConfig(
     reportNode: issue.node,
   }));
   if (!currentFile || !parser) {
-    return {
+    const result: ProjectRouteConfigAnalysis = {
       current,
       entries,
       issues,
       importedFiles: [],
       hasUnknownImports: false,
     };
+    programMemo.set(memoKey, result);
+    return result;
   }
 
-  const projectRoot = path.resolve(getCwd(context));
   const visited = new Set<string>([path.normalize(currentFile)]);
   const importedFiles: string[] = [];
   let hasUnknownImports = false;
@@ -252,5 +320,13 @@ export function analyzeProjectRouteConfig(
     }
   }
 
-  return { current, entries, issues, importedFiles, hasUnknownImports };
+  const result: ProjectRouteConfigAnalysis = {
+    current,
+    entries,
+    issues,
+    importedFiles,
+    hasUnknownImports,
+  };
+  programMemo.set(memoKey, result);
+  return result;
 }

@@ -1,11 +1,12 @@
-import fs from "node:fs";
-
 import type { TSESTree } from "@typescript-eslint/utils";
 
 import { createRule } from "../utils/create-rule.js";
 import { findLocalDeclaration, functionFromDeclaration, walkNode } from "../utils/ast.js";
 import { getExport } from "../utils/exports.js";
-import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
+import {
+  analyzeProjectRouteConfig,
+  readCachedFile,
+} from "../utils/project-route-config.js";
 import { resolveRouteModule } from "../utils/path-resolution.js";
 import { getRouteModuleExports } from "../utils/route-module.js";
 import {
@@ -101,12 +102,8 @@ export default createRule<Options, "missingOutlet">({
           if (!entry.hasChildren || !entry.file || !entry.fileNode) continue;
           const resolved = resolveRouteModule(context, entry.file);
           if (!resolved.absolutePath) continue;
-          let source: string;
-          try {
-            source = fs.readFileSync(resolved.absolutePath, "utf8");
-          } catch {
-            continue;
-          }
+          const source = readCachedFile(resolved.absolutePath);
+          if (source === undefined) continue;
           if (
             /<Outlet\b/u.test(source) ||
             /\buseOutlet\s*\(/u.test(source) ||

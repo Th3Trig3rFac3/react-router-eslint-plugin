@@ -12,7 +12,7 @@
     },
     "packageManager": {
       "name": "pnpm",
-      "version": "^12.16.1",
+      "version": "^12.18.0",
       "onFail": "download"
     }
   },
@@ -78,7 +78,7 @@
     "eslint-plugin-eslint-plugin": "^7.6.2",
     "prettier": "^3.9.10",
     "publint": "^0.3.25",
-    "tsdown": "^0.23.5",
+    "tsdown": "^0.23.7",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0"
@@ -92,6 +92,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:mocks": "vitest run tests/mocks",
+    "test:perf": "vitest run tests/performance",
+    "test:security": "vitest run tests/security",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "docs:check": "tsx scripts/verify-rule-index.ts",

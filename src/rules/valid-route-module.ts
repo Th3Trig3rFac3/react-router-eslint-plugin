@@ -1,12 +1,13 @@
-import fs from "node:fs";
 import path from "node:path";
 
 import type { TSESTree } from "@typescript-eslint/utils";
-import parser from "@typescript-eslint/parser";
 
 import { createRule } from "../utils/create-rule.js";
-import { collectExports } from "../utils/exports.js";
-import { analyzeProjectRouteConfig } from "../utils/project-route-config.js";
+import {
+  analyzeProjectRouteConfig,
+  getCachedExports,
+  readCachedFile,
+} from "../utils/project-route-config.js";
 import { resolveRouteModule } from "../utils/path-resolution.js";
 import { isRouteConfigFile } from "../utils/settings.js";
 
@@ -31,26 +32,6 @@ const MEANINGFUL_EXPORTS = new Set([
   "handle",
   "shouldRevalidate",
 ]);
-
-function hasMeaningfulExport(source: string, filename: string): boolean {
-  let program: TSESTree.Program;
-  try {
-    program = parser.parse(source, {
-      ecmaVersion: "latest",
-      sourceType: "module",
-      filePath: filename,
-      ecmaFeatures: { jsx: true },
-    }) as TSESTree.Program;
-  } catch {
-    return false;
-  }
-
-  const exports = collectExports(program);
-  return (
-    exports.default !== undefined ||
-    [...exports.named.keys()].some((name) => MEANINGFUL_EXPORTS.has(name))
-  );
-}
 
 export default createRule<Options, "invalidRouteModule">({
   name: "valid-route-module",
@@ -91,13 +72,16 @@ export default createRule<Options, "invalidRouteModule">({
           if (!entry.file || !entry.fileNode) continue;
           const resolved = resolveRouteModule(context, entry.file);
           if (!resolved.absolutePath) continue;
-          let source: string;
-          try {
-            source = fs.readFileSync(resolved.absolutePath, "utf8");
-          } catch {
+          const source = readCachedFile(resolved.absolutePath);
+          if (source === undefined) continue;
+          const exports = getCachedExports(resolved.absolutePath);
+          if (
+            exports &&
+            (exports.default !== undefined ||
+              [...exports.named.keys()].some((name) => MEANINGFUL_EXPORTS.has(name)))
+          ) {
             continue;
           }
-          if (hasMeaningfulExport(source, resolved.absolutePath)) continue;
           if (options.allowFiles?.includes(entry.file)) continue;
           context.report({
             node:

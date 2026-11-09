@@ -1,26 +1,26 @@
 # Test coverage review
 
-Reviewed on 2026-10-26 against the current working tree. This document records
+Reviewed on 2026-11-09 against the current working tree. This document records
 the current measured baseline and the remaining improvements that are useful
 for this static-analysis plugin.
 
 ## Current result and measurement
 
-`pnpm test` passes with **34 test files and 172 tests**. The test run used
-Windows, Node.js 24.22.1, ESLint 10.14.0, and TypeScript ESLint parser 8.72.0.
+`pnpm test` passes with **37 test files and 193 tests**. The test run used
+Windows, Node.js 26.12.1, ESLint 10.14.0, and TypeScript ESLint parser 8.72.1.
 It does not replace the cross-platform or minimum ESLint boundary matrix.
 
-`pnpm test:coverage` runs the same 172 tests with the V8 provider and includes
+`pnpm test:coverage` runs the test suite with the V8 provider and includes
 all runtime TypeScript sources under `src/**/*.ts`. `src/types.ts` is excluded
 because it contains type declarations and no runtime behavior. The current
-baseline was reproduced on 2026-10-26 and is unchanged from the prior review:
+measured baseline:
 
 | Metric     |                 Result |
 | ---------- | ---------------------: |
-| Statements | 82.12% (1,493 / 1,818) |
-| Branches   | 74.55% (1,480 / 1,985) |
-| Functions  |     91.30% (252 / 276) |
-| Lines      | 87.35% (1,333 / 1,526) |
+| Statements | 84.31% (1,580 / 1,874) |
+| Branches   | 75.74% (1,530 / 2,020) |
+| Functions  |     92.17% (259 / 281) |
+| Lines      | 89.58% (1,411 / 1,575) |
 
 The [Vitest configuration](../vitest.config.ts) writes text, JSON summary, and
 HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24
@@ -28,7 +28,7 @@ CI matrix entry. No minimum threshold is enforced yet: the baseline should be
 used to choose meaningful thresholds after the highest-value branches are
 covered, rather than making a blanket 100% target that rewards duplicate cases.
 
-There are **32 rule suites and 11 integration tests**. The plugin exports **33
+There are **32 rule suites, 11 integration tests, 10 fault-injection tests, 2 performance benchmarks, and 9 security tests**. The plugin exports **33
 rule names backed by 32 distinct implementations** because
 `valid-resource-route` aliases `resource-route-returns-response`. Every distinct
 implementation now has a dedicated test suite or equivalent integration
@@ -46,6 +46,9 @@ with JSX enabled. Rule suites cover both accepted code and reported diagnostics.
 | Route exports and lifecycle rules          | Action-only modules, conflicting/invalid exports, boundaries, hydration, resource responses, revalidation, middleware, navigation, and import boundaries have valid/invalid cases. Import-boundary tests now distinguish server/client reachability, helper chains, type-only imports, side effects, configured packages, and exemptions. | Lower branch coverage remains in rules with many syntax-specific paths, especially `no-action-form-default-method`, `no-resource-route-client-navigation`, `require-outlet-for-child-routes`, and `return-server-middleware-response`. |
 | Cross-file behavior                        | The graph fixture and temporary-project tests cover shared fragments, cycles, malformed and missing imports, outside-root imports, and cache invalidation after a fragment changes in the same ESLint process.                                                                                                                            | Application-level module resolution and bundler behavior are outside this package's ownership.                                                                                                                                         |
 | Public plugin and documentation contract   | Integration tests assert the complete registry, alias identity, presets, TSX parser setup, and README/docs-index behavior, including temporary checks for missing pages, stale rules, wrong labels, and support-range drift.                                                                                                              | Package export and tarball validation still runs separately because it checks built artifacts and published metadata.                                                                                                                  |
+| Security & boundary constraints            | Path traversal prevention, null-byte rejection, symlink escape detection, cycle/depth bounds (`maxDepth = 16`), glob/brace DoS protection, and zero user code execution guarantees during AST parsing are verified.                                                                                                                       | Heuristics only apply to statically analyzable patterns; arbitrary runtime computed code paths are skipped.                                                                                                                            |
+| Fault injection & resilience               | Permission errors (`EACCES`/`EPERM`), missing parser fallback, broken/cyclic symlinks (`ELOOP`/`ENOENT`), and I/O failures degrade gracefully without unhandled exceptions or crashes.                                                                                                                                                    | Does not simulate low-level hardware or kernel memory faults.                                                                                                                                                                          |
+| Performance & caching                      | 1,000 route modules benchmark asserts overhead stays under the `< 20%` budget over parser-only linting; multi-rule cache tests assert zero redundant disk reads across all 8 route-config rules.                                                                                                                                          | Real-world performance can vary depending on filesystem speed, disk caches, and runner noisy-neighbor conditions.                                                                                                                      |
 | Shared utilities                           | Utility behavior is exercised through rules and integration tests. Coverage reports make remaining paths visible, including lower branch coverage in `ast.ts`, `exports.ts`, and parts of route analysis.                                                                                                                                 | Dedicated utility tests are only useful for a contract that cannot be expressed clearly through a rule.                                                                                                                                |
 
 The graph analyzer treats recursive imports as uncertain for orphan checks.

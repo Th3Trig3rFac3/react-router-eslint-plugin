@@ -67,8 +67,8 @@ review does not accidentally treat the provisional name as available.
 - Start with React Router framework-mode syntax used by the latest stable release and test the previous maintained major where practical.
 - Treat `react-router` and `@react-router/dev` as fixture/dev dependencies, not runtime peer dependencies. AST-based rules should not force users to install packages they do not otherwise need.
 - Keep the ESLint peer range at `^10.4.0`; CI checks the minimum and current versions against both supported Node.js boundary versions.
-- The package supports the Node.js 22 and 24 LTS lines through `^22.23.4 || ^24.22.1`; development and release tooling prioritize Node.js 24, while CI retains Node.js 22 coverage.
-- Keep `@types/node` development-only and aligned with the primary Node.js 24 development runtime. Node.js 22 compatibility must continue to be verified by CI rather than inferred from the type package version.
+- The package supports Node.js 22, 24, and 26 through `^22.23.4 || ^24.22.1 || ^26.13.0`; development tooling uses Node.js 26 (`^26.13.0`), while CI retains 22.x, 24.x, and 26.x coverage.
+- Keep `@types/node` development-only and aligned with the Node.js 26 development runtime. Node.js 22 and 24 compatibility must continue to be verified by CI rather than inferred from the type package version.
 - Prefer flat config. Do not add legacy eslintrc configs to a brand-new package unless user demand justifies their ongoing test burden.
 
 ### License
@@ -424,8 +424,9 @@ boundary.
 - Cache file existence, parsed exports, and route config results within a lint process.
 - Invalidate caches by real path and modification metadata where necessary.
 - Avoid parsing an entire repository for a rule attached to one file.
-- Add a representative performance fixture and a documented budget, such as less than 20% overhead over parser-only linting for 1,000 route modules on CI hardware.
-- Treat malformed files, permission errors, and missing parser services as normal diagnostics or safe skips, never crashes.
+- Representative performance fixture and documented budget are implemented in `tests/performance/benchmark.test.ts` (< 20% overhead over parser-only linting for 1,000 route modules and zero redundant disk reads across multi-rule lint runs).
+- Fault-injection tests in `tests/mocks/fault-injection.test.ts` verify that permission errors (`EACCES`/`EPERM`), broken/cyclic symlinks, and missing parser fallbacks degrade gracefully as safe diagnostics/skips without crashes.
+- Security tests in `tests/security/security.test.ts` verify path traversal prevention, null-byte rejection, symlink escape containment, cycle/depth bounds (`maxDepth = 16`), and regex/brace DoS protection.
 
 ## 9. Testing strategy
 
@@ -462,7 +463,7 @@ For every rule, include valid and invalid cases for:
 
 Current CI runs format, lint, typecheck, unit/integration tests, docs-index
 validation, and build across the OS/Node matrix. Coverage runs on Ubuntu/Node
-24, and package validation runs on Ubuntu. A minimum/current ESLint job runs
+26, and package validation runs on Ubuntu. A minimum/current ESLint job runs
 the `ci` script separately. Dependency/license auditing and generated-doc
 consistency are still release requirements to implement. Set branch protection
 only after the checks are stable.
@@ -558,6 +559,7 @@ Exit criterion: every strict diagnostic represents a documented policy, and cont
 - [x] Add the parser-backed, project-bounded route-config graph with caching and cycle/depth protection.
 - [x] Add rule documentation, README entries, focused tests, and the `all` configuration.
 - [x] Verify formatting, linting, typechecking, tests, documentation indexes, and package publishability.
+- [x] Add fault-injection tests for filesystem/parser resilience, a 1,000 route modules performance benchmark (< 20% budget), and a security test suite (path traversal, symlinks, cycle/depth bounds, regex DoS).
 - [ ] Replace documented syntax/text heuristics where framework parity is required; expand real-application validation before promoting policies.
 
 ### Phase 5 — prerelease and stable release
