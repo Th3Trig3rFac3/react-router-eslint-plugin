@@ -6,6 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
+import process from "node:process";
 import parser from "@typescript-eslint/parser";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 

@@ -4,3 +4,4 @@ coverage/
 .vite/
 .turbo/
 *.tsbuildinfo
+.agents/
