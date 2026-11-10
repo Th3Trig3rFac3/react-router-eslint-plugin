@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.1
+
+### Changed
+
+- **Performance Benchmarks**: Enhanced performance benchmarks with improved overhead measurement and warmup configuration.
+- **Tooling & Environment**: Refined CI and local action runner configurations, ignore files, and workspace engine permissions.
+
 ## 0.2.0
 
 ### Added
