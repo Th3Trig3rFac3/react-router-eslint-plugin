@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.2
+
+### Changed
+
+- **Package Identity & Scope**: Scoped package name to `@th3trig3rfac3/eslint-plugin-react-router` for npm registry release.
+- **Documentation**: Updated package installation commands and flat config import examples to the scoped package name.
+
 ## 0.2.1
 
 ### Changed

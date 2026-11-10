@@ -62,14 +62,13 @@ in the same policy, because they produce duplicate diagnostics.
 ## Installation
 
 After the package name is confirmed and the first npm release is made, install
-the plugin alongside ESLint. Replace `YOUR_PACKAGE_NAME` with the final
-maintainer-controlled package name:
+the plugin alongside ESLint:
 
 ```sh
-npm install --save-dev eslint YOUR_PACKAGE_NAME
-pnpm add --save-dev eslint YOUR_PACKAGE_NAME
-yarn add --dev eslint YOUR_PACKAGE_NAME
-bun add --dev eslint YOUR_PACKAGE_NAME
+npm install --save-dev eslint @th3trig3rfac3/eslint-plugin-react-router
+pnpm add --save-dev eslint @th3trig3rfac3/eslint-plugin-react-router
+yarn add --dev eslint @th3trig3rfac3/eslint-plugin-react-router
+bun add --dev eslint @th3trig3rfac3/eslint-plugin-react-router
 ```
 
 Until then, use a packed tarball from this repository (`pnpm build && pnpm pack`)
@@ -90,7 +89,7 @@ for local validation.
 The flat-config API is:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [reactRouter.configs.recommended];
 ```
@@ -106,7 +105,7 @@ also inspect JSX in TSX route modules, so enable JSX in the parser options:
 
 ```js
 import tsParser from "@typescript-eslint/parser";
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [
   {
@@ -127,7 +126,7 @@ for parser options and other supported parsers.
 For a reviewed, higher-signal policy bundle:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [reactRouter.configs.strict];
 ```
@@ -135,7 +134,7 @@ export default [reactRouter.configs.strict];
 To customize a monorepo or non-standard app directory:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [
   {
@@ -249,13 +248,8 @@ Early feedback is particularly useful for:
 
 ## Project name and affiliation
 
-The npm package name is not final. An npm/CDN check found that
-`eslint-plugin-react-router` is already occupied by a legacy `0.0.1` package,
-so this repository's unscoped name is a provisional local/CI identifier only.
-Before publishing an alpha, the owner must select an available
-maintainer-controlled scope or alternate name and update package metadata,
-installation examples, and release automation together. Do not publish under
-the occupied name or imply that this project is the legacy package.
+This package is published to npm under the maintainer-controlled scope
+`@th3trig3rfac3/eslint-plugin-react-router`.
 
 This is currently a community project and is not affiliated with or endorsed by
 Shopify, Remix, or the React Router maintainers. React Router and Remix are

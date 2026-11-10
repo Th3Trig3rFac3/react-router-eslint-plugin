@@ -6,7 +6,7 @@
 > external application feedback, and publishing tasks remain unchecked until
 > they are completed by the maintainer.
 
-The current package is version `0.2.1`, with 33 exported rule names backed by
+The current package is version `0.2.2`, with 33 exported rule names backed by
 32 implementations. The [documentation index](./README.md) describes current
 presets, settings, and activation requirements; individual rule pages describe
 known heuristic limits. This plan also retains future requirements. Generated

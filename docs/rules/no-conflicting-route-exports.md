@@ -12,7 +12,7 @@ The rule is disabled by default because these APIs are experimental. Enable the
 opt-in preset when the application uses RSC:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [reactRouter.configs.rsc];
 ```
