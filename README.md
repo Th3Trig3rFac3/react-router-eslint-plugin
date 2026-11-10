@@ -1,7 +1,7 @@
 # ESLint Plugin for React Router
 
 > [!IMPORTANT]
-> This project is in prerelease development and has not been published to npm.
+> This project is in prerelease development.
 > The rule API may change before a stable 1.0 release.
 
 An ESLint plugin for catching common mistakes in React Router framework-mode
@@ -61,8 +61,7 @@ in the same policy, because they produce duplicate diagnostics.
 
 ## Installation
 
-After the package name is confirmed and the first npm release is made, install
-the plugin alongside ESLint:
+Install the plugin alongside ESLint:
 
 ```sh
 npm install --save-dev eslint @th3trig3rfac3/eslint-plugin-react-router
@@ -70,9 +69,6 @@ pnpm add --save-dev eslint @th3trig3rfac3/eslint-plugin-react-router
 yarn add --dev eslint @th3trig3rfac3/eslint-plugin-react-router
 bun add --dev eslint @th3trig3rfac3/eslint-plugin-react-router
 ```
-
-Until then, use a packed tarball from this repository (`pnpm build && pnpm pack`)
-for local validation.
 
 ## Configurations
 

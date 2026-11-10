@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.2.3
+
+### Documentation
+
+- Corrected prerelease notices and installation instructions in `README.md` following the initial npm release.
+
 ## 0.2.2
 
 ### Changed
