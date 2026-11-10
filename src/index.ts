@@ -73,7 +73,7 @@ export const rules = {
 };
 
 export const meta = {
-  name: "eslint-plugin-react-router",
+  name: packageJson.name,
   version: packageJson.version,
   namespace: "react-router",
 };

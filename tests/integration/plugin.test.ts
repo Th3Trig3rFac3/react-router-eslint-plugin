@@ -81,7 +81,7 @@ function projectEslint(cwd: string, rules: Record<string, unknown>): ESLint {
 describe("plugin package", () => {
   it("exports the documented rules and flat configs", () => {
     expect(plugin.meta).toMatchObject({
-      name: "eslint-plugin-react-router",
+      name: packageJson.name,
       version: packageJson.version,
       namespace: "react-router",
     });
