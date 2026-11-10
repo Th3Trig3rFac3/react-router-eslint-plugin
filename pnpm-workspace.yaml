@@ -1,2 +1,8 @@
 allowBuilds:
   esbuild: true
+permissions:
+  tsdown:
+    skills: true
+skills:
+  dirs:
+    - .gemini/skills
