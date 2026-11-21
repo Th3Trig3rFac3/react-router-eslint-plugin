@@ -6,7 +6,6 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { configs, rules } from "../../src/index.js";
 import { verifyRuleIndex } from "../../scripts/rule-index.js";
 
-const aliases = { "valid-resource-route": "resource-route-returns-response" };
 const timeout = 30_000;
 const roots: string[] = [];
 
@@ -20,7 +19,7 @@ async function fixture(): Promise<string> {
   await mkdir(path.join(root, "docs", "rules"), { recursive: true });
   await mkdir(path.join(root, ".github", "workflows"), { recursive: true });
 
-  const canonicalRules = Object.keys(rules).filter((name) => !(name in aliases));
+  const canonicalRules = Object.keys(rules);
   const recommended = new Set(Object.keys(configs.recommended.rules));
   const strict = new Set(Object.keys(configs.strict.rules));
   const rsc = new Set(Object.keys(configs.rsc.rules));
@@ -35,7 +34,7 @@ async function fixture(): Promise<string> {
     return `| \`${name}\` | Example rule | ${label} |`;
   });
   const packageJson = {
-    engines: { node: "^22.23.2 || ^24.21.0" },
+    engines: { node: "^22.23.5 || ^24.22.3 || ^26.13.1" },
     peerDependencies: { eslint: "^10.4.0" },
   };
   const write = (filename: string, contents: string) =>
@@ -46,19 +45,24 @@ async function fixture(): Promise<string> {
   );
   await write(
     "README.md",
-    ["| Node.js | `^22.23.2 \\|\\| ^24.21.0` |", "| ESLint | `^10.4.0` |", ...rows].join(
-      "\n",
-    ),
+    [
+      "| Node.js | `^22.23.5 \\|\\| ^24.22.3 \\|\\| ^26.13.1` |",
+      "| ESLint | `^10.4.0` |",
+      ...rows,
+    ].join("\n"),
   );
-  await write("CONTRIBUTING.md", "Node.js `^22.23.2 || ^24.21.0` and ESLint `^10.4.0`.");
+  await write(
+    "CONTRIBUTING.md",
+    "Node.js `^22.23.5 || ^24.22.3 || ^26.13.1` and ESLint `^10.4.0`.",
+  );
   await write(
     "docs/compatibility.md",
-    "`engines.node: ^22.23.2 \\|\\| ^24.21.0` and `peerDependencies.eslint: ^10.4.0`.",
+    "`engines.node: ^22.23.5 \\|\\| ^24.22.3 \\|\\| ^26.13.1` and `peerDependencies.eslint: ^10.4.0`.",
   );
   await write("package.json", JSON.stringify(packageJson));
   await write(
     ".github/workflows/ci.yml",
-    "  eslint-boundary:\n    matrix:\n      node: [22.x, 24.x]\n      eslint: [10.4.0, 10.14.0]\n",
+    "  eslint-boundary:\n    matrix:\n      node: [22.x, 24.x]\n      eslint: [10.4.0, 10.15.0]\n",
   );
   return root;
 }
@@ -126,8 +130,25 @@ describe("rule documentation index", () => {
       await writeFile(readmePath, readme.replace("^10.4.0", "^10.0.0"), "utf8");
       expect(() => verifyRuleIndex(root)).toThrow("README ESLint support row");
 
-      await writeFile(readmePath, readme.replace("^22.23.2", "^22.0.0"), "utf8");
+      await writeFile(readmePath, readme.replace("^22.23.5", "^22.0.0"), "utf8");
       expect(() => verifyRuleIndex(root)).toThrow("README Node.js support row");
+    },
+    timeout,
+  );
+
+  it(
+    "rejects stale CI ESLint boundary matrix versions",
+    async () => {
+      const ciPath = path.join(root, ".github", "workflows", "ci.yml");
+      const ci = await readFile(ciPath, "utf8");
+      await writeFile(
+        ciPath,
+        ci.replace("eslint: [10.4.0, 10.15.0]", "eslint: [10.4.0, 10.14.0]"),
+        "utf8",
+      );
+      expect(() => verifyRuleIndex(root)).toThrow(
+        "CI ESLint boundary job must test ESLint 10.4.0 and 10.15.0",
+      );
     },
     timeout,
   );

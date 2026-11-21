@@ -21,9 +21,7 @@ import requireResourceContentType from "./rules/require-resource-content-type.js
 import requireRouteErrorBoundary from "./rules/require-route-error-boundary.js";
 import preferLinkForInternalNavigation from "./rules/prefer-link-for-internal-navigation.js";
 import returnServerMiddlewareResponse from "./rules/return-server-middleware-response.js";
-import resourceRouteReturnsResponse, {
-  validResourceRouteRule,
-} from "./rules/resource-route-returns-response.js";
+import resourceRouteReturnsResponse from "./rules/resource-route-returns-response.js";
 import safeShouldRevalidate from "./rules/safe-should-revalidate.js";
 import splittableRouteModule from "./rules/splittable-route-module.js";
 import validPrerenderPaths from "./rules/valid-prerender-paths.js";
@@ -65,7 +63,6 @@ export const rules = {
   "safe-should-revalidate": safeShouldRevalidate,
   "splittable-route-module": splittableRouteModule,
   "valid-prerender-paths": validPrerenderPaths,
-  "valid-resource-route": validResourceRouteRule,
   "valid-route-config": validRouteConfig,
   "valid-route-module": validRouteModule,
   "valid-route-module-path": validRouteModulePath,

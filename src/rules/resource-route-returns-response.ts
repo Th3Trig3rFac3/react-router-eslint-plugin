@@ -212,8 +212,4 @@ export const resourceRouteReturnsResponseRule = createRule<Options, "missingResp
   },
 });
 
-// Keep the name proposed in the original project brief as a compatibility
-// alias while the more precise rule name is used in new documentation/configs.
-export const validResourceRouteRule = resourceRouteReturnsResponseRule;
-
 export default resourceRouteReturnsResponseRule;

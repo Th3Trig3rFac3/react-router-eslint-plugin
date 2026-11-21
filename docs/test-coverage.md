@@ -1,38 +1,39 @@
 # Test coverage review
 
-Reviewed on 2026-11-09 against the current working tree. This document records
-the current measured baseline and the remaining improvements that are useful
-for this static-analysis plugin.
+Reviewed on 2026-11-21 against the `1.0.0` working tree (removing the
+`valid-resource-route` alias and the unused `allow` options on middleware
+rules). This document records that measured local baseline and the remaining
+improvements that are useful for this static-analysis plugin.
 
 ## Current result and measurement
 
-`pnpm test` passes with **37 test files and 193 tests**. The test run used
-Windows, Node.js 26.12.1, ESLint 10.14.0, and TypeScript ESLint parser 8.72.1.
-It does not replace the cross-platform or minimum ESLint boundary matrix.
+`pnpm test` passed in the 2026-11-21 local `1.0.0` baseline with **37 test files
+and 197 tests**. The test run used Windows, Node.js 26.12.1, ESLint 10.15.0,
+and TypeScript ESLint parser 8.73.0. It does not replace the cross-platform
+OS/Node 22/24/26 CI matrix or minimum ESLint `10.4.0` boundary checks.
 
 `pnpm test:coverage` runs the test suite with the V8 provider and includes
 all runtime TypeScript sources under `src/**/*.ts`. `src/types.ts` is excluded
-because it contains type declarations and no runtime behavior. The current
+because it contains type declarations and no runtime behavior. The 2026-11-21
 measured baseline:
 
 | Metric     |                 Result |
 | ---------- | ---------------------: |
-| Statements | 84.31% (1,580 / 1,874) |
+| Statements | 84.30% (1,579 / 1,873) |
 | Branches   | 75.74% (1,530 / 2,020) |
 | Functions  |     92.17% (259 / 281) |
-| Lines      | 89.58% (1,411 / 1,575) |
+| Lines      | 89.58% (1,410 / 1,574) |
 
 The [Vitest configuration](../vitest.config.ts) writes text, JSON summary, and
-HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 24
+HTML reports. The `test:coverage` script is also run once on the Ubuntu/Node 26
 CI matrix entry. No minimum threshold is enforced yet: the baseline should be
 used to choose meaningful thresholds after the highest-value branches are
 covered, rather than making a blanket 100% target that rewards duplicate cases.
 
-There are **32 rule suites, 11 integration tests, 10 fault-injection tests, 2 performance benchmarks, and 9 security tests**. The plugin exports **33
-rule names backed by 32 distinct implementations** because
-`valid-resource-route` aliases `resource-route-returns-response`. Every distinct
-implementation now has a dedicated test suite or equivalent integration
-coverage.
+In the 2026-11-21 `1.0.0` baseline, there are **32 rule suites, 12 integration
+tests, 10 fault-injection tests, 2 performance benchmarks, and 9 security
+tests**. The plugin exports **32 rules**, and every rule has a dedicated test
+suite or equivalent integration coverage.
 
 ## What is covered
 
@@ -45,7 +46,7 @@ with JSX enabled. Rule suites cover both accepted code and reported diagnostics.
 | Route module validity and orphan detection | `valid-route-module` covers component, loader, named re-export, type-only, missing, allowlisted, and comment/string false-positive cases. `no-orphan-route-modules` covers referenced, orphaned, root, allowlisted, ignored, dynamic, incomplete, malformed, outside-root, and cyclic graphs.                                             | These checks intentionally skip dynamic or uncertain graphs; they do not attempt to execute application route discovery.                                                                                                               |
 | Route exports and lifecycle rules          | Action-only modules, conflicting/invalid exports, boundaries, hydration, resource responses, revalidation, middleware, navigation, and import boundaries have valid/invalid cases. Import-boundary tests now distinguish server/client reachability, helper chains, type-only imports, side effects, configured packages, and exemptions. | Lower branch coverage remains in rules with many syntax-specific paths, especially `no-action-form-default-method`, `no-resource-route-client-navigation`, `require-outlet-for-child-routes`, and `return-server-middleware-response`. |
 | Cross-file behavior                        | The graph fixture and temporary-project tests cover shared fragments, cycles, malformed and missing imports, outside-root imports, and cache invalidation after a fragment changes in the same ESLint process.                                                                                                                            | Application-level module resolution and bundler behavior are outside this package's ownership.                                                                                                                                         |
-| Public plugin and documentation contract   | Integration tests assert the complete registry, alias identity, presets, TSX parser setup, and README/docs-index behavior, including temporary checks for missing pages, stale rules, wrong labels, and support-range drift.                                                                                                              | Package export and tarball validation still runs separately because it checks built artifacts and published metadata.                                                                                                                  |
+| Public plugin and documentation contract   | Integration tests assert the complete registry, presets, TSX parser setup, and README/docs-index behavior, including temporary checks for missing pages, stale rules, wrong labels, and support-range drift.                                                                                                                              | Package export and tarball validation still runs separately because it checks built artifacts and published metadata.                                                                                                                  |
 | Security & boundary constraints            | Path traversal prevention, null-byte rejection, symlink escape detection, cycle/depth bounds (`maxDepth = 16`), glob/brace DoS protection, and zero user code execution guarantees during AST parsing are verified.                                                                                                                       | Heuristics only apply to statically analyzable patterns; arbitrary runtime computed code paths are skipped.                                                                                                                            |
 | Fault injection & resilience               | Permission errors (`EACCES`/`EPERM`), missing parser fallback, broken/cyclic symlinks (`ELOOP`/`ENOENT`), and I/O failures degrade gracefully without unhandled exceptions or crashes.                                                                                                                                                    | Does not simulate low-level hardware or kernel memory faults.                                                                                                                                                                          |
 | Performance & caching                      | 1,000 route modules benchmark asserts overhead stays under the `< 20%` budget over parser-only linting; multi-rule cache tests assert zero redundant disk reads across all 8 route-config rules.                                                                                                                                          | Real-world performance can vary depending on filesystem speed, disk caches, and runner noisy-neighbor conditions.                                                                                                                      |
@@ -85,8 +86,6 @@ without requiring tests for unreachable defensive code.
 
 ## Where no additional tests are needed
 
-- Do not duplicate the resource-response suite for `valid-resource-route`; both
-  names use the same implementation, and alias identity is already asserted.
 - Do not add browser, UI snapshot, HTTP-server, database, or React rendering
   tests. The package performs static ESLint analysis and owns none of those
   runtime behaviors.

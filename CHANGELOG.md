@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 1.0.0
+
+### Added
+
+- **Stable 1.0.0 Release**: Published the stable 1.0.0 release with 32 React Router framework-mode rules and `recommended`, `strict`, `all`, and `rsc` flat configs (plus `flat/recommended`, `flat/strict`, `flat/all`, and `flat/rsc` aliases).
+
+### Changed
+
+- **Packaging & Consumer Documentation**: Removed development-only `docs/` from the published npm package `"files"` array (`["dist", "README.md", "LICENSE", "CHANGELOG.md"]`), consolidated complete configuration, rule options, `settings.reactRouter`, and static-analysis boundary documentation into `README.md`, and removed prerelease notices.
+- **Toolchain & Engines**: Updated `engines.node` to `^22.23.5 || ^24.22.3 || ^26.13.1`, updated the ESLint CI boundary matrix to `[10.4.0, 10.15.0]` (`eslint` `^10.15.0`), and updated development/plugin dependencies (`@typescript-eslint/*` `^8.73.0`, `prettier` `^3.10.1`, `vitest` `^5.1.1`, `@vitest/coverage-v8` `^5.1.1`, and `devEngines.packageManager.version` `^12.21.0`).
+
+### Removed
+
+- **Legacy Rule Alias (`valid-resource-route`)**: Removed the `valid-resource-route` compatibility alias; `resource-route-returns-response` is now the sole exported name, eliminating duplicate reports in the `all` config.
+- **Unused Middleware Rule Options**: Removed the unused `allow` schema option from `no-multiple-middleware-next` and `return-server-middleware-response`.
+
 ## 0.2.3
 
 ### Documentation

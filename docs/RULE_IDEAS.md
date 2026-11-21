@@ -139,8 +139,8 @@ middleware invocation; a second call throws at runtime. Recognize route module
 `middleware` and `clientMiddleware` arrays, including locally declared functions.
 Skip callbacks, aliases, loops, and branches where execution count is uncertain.
 
-Current config: `strict` error. There is no path-sensitive option. The schema's
-`allow` option is currently unused; use a targeted disable for exceptions.
+Current config: `strict` error. There is no path-sensitive option; use a targeted
+disable for exceptions.
 
 ### `return-server-middleware-response` — implemented
 
@@ -151,8 +151,8 @@ that intentionally omits `next()` and relies on React Router's automatic call,
 or `clientMiddleware`, whose return contract differs. Start with direct
 `await next();` followed by an empty return or function end; defer complex
 control flow. The implementation accepts any non-`undefined` top-level return
-as sufficient and does not verify its type. The schema's `allow` option is
-currently unused.
+as sufficient and does not verify its type. Use a targeted disable for
+exceptions.
 
 Suggested config: `strict` until confirmed against representative applications.
 

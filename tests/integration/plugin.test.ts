@@ -48,7 +48,6 @@ const ruleNames = [
   "safe-should-revalidate",
   "splittable-route-module",
   "valid-prerender-paths",
-  "valid-resource-route",
   "valid-route-config",
   "valid-route-module",
   "valid-route-module-path",
@@ -85,10 +84,9 @@ describe("plugin package", () => {
       version: packageJson.version,
       namespace: "react-router",
     });
+    expect(ruleNames).toHaveLength(32);
     expect(Object.keys(plugin.rules)).toEqual([...ruleNames]);
-    expect(plugin.rules["valid-resource-route"]).toBe(
-      plugin.rules["resource-route-returns-response"],
-    );
+    expect(plugin.rules).not.toHaveProperty("valid-resource-route");
     expect(plugin.configs).toHaveProperty("recommended");
     expect(plugin.configs).toHaveProperty("strict");
     expect(plugin.configs).toHaveProperty("all");

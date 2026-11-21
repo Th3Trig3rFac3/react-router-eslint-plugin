@@ -29,8 +29,7 @@ for a fetcher/form-facing route that intentionally returns `data(...)`.
 `files` optionally restricts project-relative filenames, and `allowFiles`
 exempts matching files. Without `files`, every recognized resource module in
 the ESLint scope is checked. The example above supplies scope through the flat
-config's `files` instead. Both names are enabled by `all`; turn off the
-`valid-resource-route` alias to avoid duplicate reports.
+config's `files` instead.
 
 This is a syntax policy, not a control-flow proof. Returned identifiers,
 custom response factories, `Response.json()`, and ordinary thrown errors can

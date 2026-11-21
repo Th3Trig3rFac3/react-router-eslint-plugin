@@ -1,15 +1,15 @@
 # Documentation
 
-Reviewed against the source and package metadata on 2026-10-26. This plugin is
-in prerelease development; the package name and first publication remain
-maintainer decisions.
+Repository development documentation for `@th3trig3rfac3/eslint-plugin-react-router`
+(`1.0.0`). This `docs/` directory is for repository development only and is
+excluded from the published npm tarball; npm consumers receive the self-contained
+[README](../README.md).
 
 - [Installation and quick start](../README.md#installation)
 - [Rule catalog](../README.md#rules) and [individual rule pages](./rules/)
 - [Compatibility and CI boundaries](./compatibility.md)
 - [Measured test coverage](./test-coverage.md)
-- [Implementation plan and remaining release work](./PLAN.md)
-- [Consumer application integration test improvement plan](./CONSUMER_INTEGRATION_PLAN.md)
+- [Implementation plan and release checklist](./PLAN.md)
 - [Implemented ideas and deferred proposals](./RULE_IDEAS.md)
 - [MVP design decisions](./rfcs/README.md)
 - [Historical application validation](./validation/mvp-semantics.md)
@@ -22,18 +22,17 @@ All presets register the `react-router` plugin and target
 [TypeScript and TSX setup](../README.md#typescript-and-tsx-setup) when needed.
 The `flat/` names are aliases of the same preset objects.
 
-| Preset        | Behavior                                                                                                                                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recommended` | Six errors: root boundary, route-config shape, module-path resolution, duplicate IDs, duplicate parameters, and conflicting paths. `no-action-only-routes` is a warning.                                      |
-| `strict`      | Includes `recommended`, raises `no-action-only-routes` to error, and adds the strict rules listed in the catalog. Context-dependent checks still need configuration.                                          |
-| `all`         | Enables all 33 exported rule names at warning severity, including both names of the resource-response rule. Disable `valid-resource-route` to avoid duplicate reports. The RSC check still needs `rsc: true`. |
-| `rsc`         | Enables only `no-conflicting-route-exports` at error severity with `rsc: true`; it does not extend another preset.                                                                                            |
+| Preset        | Behavior                                                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `recommended` | Six errors: root boundary, route-config shape, module-path resolution, duplicate IDs, duplicate parameters, and conflicting paths. `no-action-only-routes` is a warning. |
+| `strict`      | Includes `recommended`, raises `no-action-only-routes` to error, and adds the strict rules listed in the catalog. Context-dependent checks still need configuration.     |
+| `all`         | Enables all 32 exported rules at warning severity. The RSC check still needs `rsc: true`.                                                                                |
+| `rsc`         | Enables only `no-conflicting-route-exports` at error severity with `rsc: true`; it does not extend another preset.                                                       |
 
-`recommended` and `strict` omit `resource-route-returns-response` and its
-`valid-resource-route` alias. Enable the canonical name in a file-scoped flat
-config override for external resource endpoints. The rule itself has no
-mandatory scope option: without `files`, it checks every recognized route
-module without a default component in its ESLint scope.
+`recommended` and `strict` omit `resource-route-returns-response`. Enable it in
+a file-scoped flat config override for external resource endpoints. The rule
+itself has no mandatory scope option: without `files`, it checks every
+recognized route module without a default component in its ESLint scope.
 
 In `strict`, the following options activate otherwise inactive policies:
 

@@ -1,18 +1,19 @@
 # React Router ESLint Plugin — Implementation Plan
 
-> **Implementation review — 2026-10-26:** Checkboxes marked `[x]` record
-> completed implementation work; they do not establish full framework parity
-> or a fresh external application run. Release decisions,
-> external application feedback, and publishing tasks remain unchecked until
-> they are completed by the maintainer.
+> **Release preparation — 1.0.0:** Checkboxes marked `[x]` record completed
+> implementation and repository metadata work; they do not establish full
+> framework parity, a fresh external application rerun beyond the historical
+> 2026-09-22 report, or completed npm publication. Post-publish tasks and
+> un-rerun external validation remain unchecked until they are completed.
 
-The current package is version `0.2.3`, with 33 exported rule names backed by
-32 implementations. The [documentation index](./README.md) describes current
-presets, settings, and activation requirements; individual rule pages describe
-known heuristic limits. This plan also retains future requirements. Generated
-documentation, performance budgets, full type/control-flow analysis, fresh
-application validation, and dependency/license auditing should not be inferred
-from checked implementation milestones.
+The current package is version `1.0.0`, with 32 exported rules. The
+[documentation index](./README.md) describes current presets, settings, and
+activation requirements (and is maintained as development-only repository
+documentation, excluded from the npm tarball); individual rule pages describe
+known heuristic limits. This plan also retains historical design rationale and
+future requirements. Generated documentation, full type/control-flow analysis,
+fresh application validation, and dependency/license auditing should not be
+inferred from checked implementation milestones.
 
 ## 1. Goal
 
@@ -35,39 +36,33 @@ Success means:
 
 ### Package identity
 
-An authoritative npm/CDN check found that the unscoped name
-`eslint-plugin-react-router` is already occupied by a legacy `0.0.1` package
-(ISC licensed). It must not be reused or presented as the same project. The
-name in this repository is therefore a provisional local/CI identifier only;
-before an alpha release, select a maintainer-controlled scope or another
-available name and update `package.json`, the exports metadata, README
-installation examples, and release workflow together. The current
-`pnpm publish` workflow is intentionally manual and must not be run until
-that decision is recorded.
+An npm/CDN check found that the unscoped name `eslint-plugin-react-router` is
+already occupied by a legacy `0.0.1` package (ISC licensed). It must not be
+reused or presented as the same project. The maintainer-controlled scoped
+package name `@th3trig3rfac3/eslint-plugin-react-router` was selected (in `0.2.2`)
+and is configured in `package.json`, plugin metadata, and README installation
+examples. The `pnpm publish` workflow remains manual (`workflow_dispatch`).
 
 Do not publish as `@react-router/eslint-plugin` or describe the package as
 official unless the React Router maintainers explicitly adopt it. Use
-`react-router` as the ESLint namespace, independently of the final package
-name:
+`react-router` as the ESLint namespace:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [reactRouter.configs.recommended];
 ```
 
-Add a short non-affiliation statement to the README when the package is
-community-maintained. Before the first release, confirm the final name with
-the package owner and reserve it with a minimal non-public dry run if
-appropriate. The legacy package check is recorded here so a future release
-review does not accidentally treat the provisional name as available.
+`README.md` includes the community non-affiliation statement. The legacy package
+check remains recorded here so future releases do not treat the unscoped name
+as available.
 
 ### Supported versions
 
 - Start with React Router framework-mode syntax used by the latest stable release and test the previous maintained major where practical.
 - Treat `react-router` and `@react-router/dev` as fixture/dev dependencies, not runtime peer dependencies. AST-based rules should not force users to install packages they do not otherwise need.
 - Keep the ESLint peer range at `^10.4.0`; CI checks the minimum and current versions against both supported Node.js boundary versions.
-- The package supports Node.js 22, 24, and 26 through `^22.23.4 || ^24.22.1 || ^26.13.0`; development tooling uses Node.js 26 (`^26.13.0`), while CI retains 22.x, 24.x, and 26.x coverage.
+- The package supports Node.js 22, 24, and 26 through `^22.23.5 || ^24.22.3 || ^26.13.1`; development tooling uses Node.js 26 and `pnpm` declared in `devEngines`, while CI retains 22.x, 24.x, and 26.x coverage.
 - Keep `@types/node` development-only and aligned with the Node.js 26 development runtime. Node.js 22 and 24 compatibility must continue to be verified by CI rather than inferred from the type package version.
 - Prefer flat config. Do not add legacy eslintrc configs to a brand-new package unless user demand justifies their ongoing test burden.
 
@@ -75,17 +70,15 @@ review does not accidentally treat the provisional name as available.
 
 The repository's existing Apache License 2.0 is a valid, permissive open-source license and may be retained. It is compatible with using MIT-licensed React Router as a development dependency and offers an explicit patent grant. The standard appendix placeholders in the current license text are part of the canonical license; they do not by themselves make the file incomplete.
 
-Before publishing:
+Package licensing configuration:
 
-- set `"license": "Apache-2.0"` in `package.json`;
-- include `LICENSE` in the npm tarball;
-- add an SPDX identifier or license link to the README;
-- decide the copyright holder name with the maintainer rather than inferring it from a Git or machine username;
-- add a `NOTICE` file only if there are attribution notices that must or should ship, or if the owner wants one; for a non-ASF original project it is not automatically required merely because Apache-2.0 was selected;
+- `"license": "Apache-2.0"` is set in `package.json`;
+- `LICENSE` is included in the npm tarball (`files`: `["dist", "README.md", "LICENSE", "CHANGELOG.md"]`), while `docs/` is development-only and excluded from the tarball;
+- `README.md` links to `LICENSE` under Apache-2.0;
+- retain Apache-2.0 unless the owner explicitly selects MIT (this section is project guidance, not legal advice);
 - preserve licenses and notices for any copied third-party code, preferably avoiding copied implementations entirely;
-- run a dependency-license check in CI and manually review exceptions before release.
-
-MIT would also be reasonable and would match React Router, Vitest's plugin, and Storybook's plugin, but changing the existing license is an owner decision. Default implementation choice: retain Apache-2.0 unless the owner explicitly selects MIT. This section is project guidance, not legal advice.
+- add a `NOTICE` file only if attribution notices must or should ship, or if the owner wants one;
+- run a dependency-license check and manually review exceptions before release.
 
 ## 3. Scope and non-goals
 
@@ -192,7 +185,8 @@ Enable as `error` in `recommended` only after testing against representative pub
 
 #### `resource-route-returns-response`
 
-This is the precise replacement for the proposed blanket `valid-resource-route` rule. React Router documents two legitimate resource-route styles:
+This rule uses a narrower, explicit-scope contract for resource routes. React
+Router documents two legitimate resource-route styles:
 
 - externally consumed resources should return/throw a `Response`;
 - routes consumed through fetchers or form submissions may return `data()`.
@@ -211,9 +205,7 @@ The implementation recognizes `new Response(...)`, `redirect(...)`,
 `redirectDocument(...)`, `replace(...)`, and optionally `data(...)` by syntax.
 It does not support configured response factories or type information. Returned
 identifiers can report, while fallthrough paths are not fully checked. This is
-not a proof that every reachable branch complies. Both exported spellings are
-enabled by `all`; disable the `valid-resource-route` alias to avoid duplicate
-reports.
+not a proof that every reachable branch complies.
 
 ### High-value follow-up rules
 
@@ -253,14 +245,14 @@ requires another ecosystem review.
 The flat config should register the plugin itself and use documented file patterns. Provide both of these supported forms in tests and README:
 
 ```js
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default [reactRouter.configs.recommended];
 ```
 
 ```js
 import { defineConfig } from "eslint/config";
-import reactRouter from "eslint-plugin-react-router";
+import reactRouter from "@th3trig3rfac3/eslint-plugin-react-router";
 
 export default defineConfig({
   plugins: { "react-router": reactRouter },
@@ -277,10 +269,10 @@ listed in the [preset activation reference](./README.md#presets).
 
 ### `all`
 
-Exports every registered name at warning severity for exploration. It is
-unstable as a policy bundle and unsuitable for CI without review. This includes
-both resource-response spellings. `no-conflicting-route-exports` is present but
-needs `rsc: true` before it checks anything.
+Enables all 32 exported rules at warning severity for exploration. It is
+unstable as a policy bundle and unsuitable for CI without review.
+`no-conflicting-route-exports` is present but needs `rsc: true` before it
+checks anything.
 
 ### `rsc`
 
@@ -351,8 +343,8 @@ Configuration changes that create new diagnostics require deliberate semver trea
 ```
 
 Rule metadata and preset membership live in source. `docs:check` verifies
-canonical page presence, README rows and preset labels, alias identity, support
-ranges, and configured CI boundaries. The table and page prose are maintained
+rule page presence, README rows and preset labels, support ranges, and
+configured CI boundaries. The table and page prose are maintained
 manually; there is no `generate-rule-docs.ts` or prose/schema drift checker yet.
 
 ## 8. Technical architecture
@@ -455,7 +447,7 @@ For every rule, include valid and invalid cases for:
 
 - Build and import from ESM and CommonJS.
 - Assert default export, rule names, configs, plugin metadata, and declaration usability.
-- Run `npm pack --dry-run` and inspect that only intended files ship, including README and LICENSE.
+- Run `npm pack --dry-run` and inspect that only intended files ship (`dist`, `README.md`, `LICENSE`, `CHANGELOG.md`), excluding development-only `docs/`.
 - Install the packed tarball in a minimal fixture and run ESLint without workspace resolution helping it.
 - Run `publint` and `attw` against the packed package.
 
@@ -470,7 +462,8 @@ only after the checks are stable.
 
 ## 10. README deliverable
 
-Expand the initial planning README into release-ready documentation during the first implementation phase. It should contain:
+The published `README.md` is self-contained for npm consumers (since `docs/` is
+development-only and excluded from the npm tarball) and covers:
 
 1. project purpose and community/non-affiliation status;
 2. supported React Router modes and versions;
@@ -489,7 +482,7 @@ Each rule gets a dedicated page with: summary, rationale, when not to use it, op
 
 ## 11. Release and maintenance
 
-- Start at `0.1.0`; keep rules and option schemas explicitly experimental until enough fixture and community feedback exists.
+- Initial prereleases started in the `0.1.x`–`0.2.x` line; `1.0.0` stabilizes the 32 exported rule names, flat configs, and option schemas.
 - Use Changesets or an equally transparent changelog workflow.
 - Publish through npm trusted publishing with provenance, protected environments, and required review. Require 2FA for maintainers.
 - Add `repository`, `homepage`, `bugs`, `funding` if applicable, `keywords`, `engines`, `peerDependencies`, `exports`, `files`, and `sideEffects: false` to `package.json`.
@@ -503,11 +496,12 @@ Each rule gets a dedicated page with: summary, rationale, when not to use it, op
 ### Phase 0 — validate assumptions
 
 - [x] Check the provisional unscoped name and record that it is occupied by a
-      legacy package; owner-controlled scope/name selection remains a release
-      decision.
-- [ ] Confirm owner, final package name, npm scope, and community/official
-      status.
-- [ ] Confirm Apache-2.0 versus an owner-approved switch to MIT.
+      legacy package so it is not reused.
+- [x] Confirm owner, final scoped package name
+      (`@th3trig3rfac3/eslint-plugin-react-router`), npm scope, and community
+      non-affiliation status.
+- [x] Confirm Apache-2.0 as the package license (`LICENSE` and
+      `"license": "Apache-2.0"`).
 - [x] Record latest and previous supported React Router, ESLint, and Node versions.
 - [x] Write short rule RFCs with examples for the MVP set.
 - [x] Validate rule semantics against official React Router docs and at least three representative applications.
@@ -564,11 +558,12 @@ Exit criterion: every strict diagnostic represents a documented policy, and cont
 
 ### Phase 5 — prerelease and stable release
 
-- [ ] Publish an alpha from the packed artifact with npm provenance.
-- [ ] Test installation in fresh React Router apps and one monorepo.
+- [x] Publish initial `0.x` prerelease to npm (recorded in `CHANGELOG.md` `0.2.3`).
+- [ ] Test `1.0.0` installation in fresh React Router apps and one monorepo.
 - [ ] Collect feedback specifically on false positives, path resolution, and config ergonomics.
-- [ ] Freeze v1 rule names/options, complete changelog and compatibility table, and audit the tarball/license.
-- [ ] Publish `1.0.0` only after the support and semver policy are credible.
+- [x] Freeze v1 rule names/options (remove `valid-resource-route` alias and unused `allow` options), update `CHANGELOG.md` and `compatibility.md`, and exclude development-only `docs/` from package `files`.
+- [ ] Audit final `1.0.0` tarball (`npm pack --dry-run` / `package:check`) and dependency licenses before publishing.
+- [ ] Publish `1.0.0` through the release workflow after final CI and package checks pass.
 
 ## 13. Definition of done for version 1
 

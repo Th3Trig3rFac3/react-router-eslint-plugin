@@ -3,7 +3,6 @@ import path from "node:path";
 
 import plugin, { configs } from "../src/index.js";
 
-const aliases = { "valid-resource-route": "resource-route-returns-response" };
 const ruleLink = (name: string) => `docs/rules/${name}.md`;
 
 export function verifyRuleIndex(root: string): string {
@@ -18,13 +17,7 @@ export function verifyRuleIndex(root: string): string {
     throw new Error("package.json must declare engines.node and peerDependencies.eslint");
   }
 
-  const rules = Object.keys(plugin.rules).filter((name) => !(name in aliases));
-  const pluginRules = plugin.rules as Record<string, unknown>;
-  for (const [alias, canonical] of Object.entries(aliases)) {
-    if (pluginRules[alias] !== pluginRules[canonical]) {
-      throw new Error(`Rule alias ${alias} must reference ${canonical}`);
-    }
-  }
+  const rules = Object.keys(plugin.rules);
 
   const readme = read("README.md").replaceAll("\\|", "|");
   const lines = readme.split(/\r?\n/u);
@@ -106,8 +99,8 @@ export function verifyRuleIndex(root: string): string {
   if (!boundary?.includes("node: [22.x, 24.x]")) {
     throw new Error("CI ESLint boundary job must use the Node.js 22.x and 24.x tags");
   }
-  if (!boundary.includes("eslint: [10.4.0, 10.14.0]")) {
-    throw new Error("CI ESLint boundary job must test ESLint 10.4.0 and 10.14.0");
+  if (!boundary.includes("eslint: [10.4.0, 10.15.0]")) {
+    throw new Error("CI ESLint boundary job must test ESLint 10.4.0 and 10.15.0");
   }
 
   return `Verified ${rules.length} rule pages, README entries, presets, and support ranges.`;

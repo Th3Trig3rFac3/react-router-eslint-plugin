@@ -9,11 +9,7 @@ import {
   walkMiddlewareBody,
 } from "../utils/middleware.js";
 
-type Options = [
-  {
-    allow?: string[];
-  }?,
-];
+type Options = [];
 
 export default createRule<Options, "multipleNext">({
   name: "no-multiple-middleware-next",
@@ -24,21 +20,13 @@ export default createRule<Options, "multipleNext">({
         "disallow statically provable repeated calls to next in a middleware invocation",
       recommended: false,
     },
-    schema: [
-      {
-        type: "object",
-        properties: {
-          allow: { type: "array", items: { type: "string" }, uniqueItems: true },
-        },
-        additionalProperties: false,
-      },
-    ],
+    schema: [],
     messages: {
       multipleNext:
         "This {{middlewareName}} function calls next() more than once on the same unconditional path. React Router permits one next() call per middleware invocation; combine the work around one call or remove the duplicate.",
     },
   },
-  defaultOptions: [{}],
+  defaultOptions: [],
   create(context) {
     return {
       Program(program: TSESTree.Program) {

@@ -20,8 +20,7 @@ report; the rule does not prove that expression is a `Response` or analyze all
 branches. Conditional returns do not necessarily suppress a report for a
 top-level call.
 
-Although the schema accepts `allow`, the implementation does not apply it;
-use a targeted ESLint disable for an intentional exception.
+Use a targeted ESLint disable for an intentional exception.
 
 ## Configuration and references
 

@@ -9,11 +9,7 @@ import {
 import { getRouteModuleExports } from "../utils/route-module.js";
 import { unwrap } from "../utils/ast.js";
 
-type Options = [
-  {
-    allow?: string[];
-  }?,
-];
+type Options = [];
 
 function nextCallFromExpression(
   node: TSESTree.Node | undefined,
@@ -50,21 +46,13 @@ export default createRule<Options, "discardedNextResponse">({
         "require server middleware that calls next to return the downstream response",
       recommended: false,
     },
-    schema: [
-      {
-        type: "object",
-        properties: {
-          allow: { type: "array", items: { type: "string" }, uniqueItems: true },
-        },
-        additionalProperties: false,
-      },
-    ],
+    schema: [],
     messages: {
       discardedNextResponse:
         "This server middleware calls next() but reaches the end without returning its response. Return the value from next() (or an intentionally replaced Response) so downstream status, headers, and body are preserved.",
     },
   },
-  defaultOptions: [{}],
+  defaultOptions: [],
   create(context) {
     return {
       Program(program: TSESTree.Program) {

@@ -18,8 +18,7 @@ execution count is uncertain. The rule has no autofix because the correct
 ordering and response policy are application-specific.
 
 Inline middleware arrays and locally declared function references are
-recognized. Although the schema accepts `allow`, the implementation does not
-apply it; use a targeted ESLint disable for an intentional exception.
+recognized. Use a targeted ESLint disable for an intentional exception.
 
 ## Configuration and references
 
